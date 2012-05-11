@@ -3,5 +3,10 @@
 
     <string name="hello">Hello World, SchiffchenActivity!</string>
     <string name="app_name">Schiffchen</string>
+    
+    <string name="aircraft_carrier">Aircraft carrier</string>
+    <string name="battleship">Battleship</string>
+    <string name="submarine">Submarine</string>
+    <string name="destoryer">Destroyer</string>
 
 </resources>
