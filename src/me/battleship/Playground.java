@@ -32,10 +32,6 @@ public class Playground
 		{
 			fields[i] = new PlaygroundField();
 		}
-		for (PlaygroundField field : fields)
-		{
-			System.out.println(field);
-		}
 	}
 	
 	/**
