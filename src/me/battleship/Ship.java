@@ -38,13 +38,19 @@ public class Ship
 	private int y;
 	
 	/**
+	 * The orientation of the ship
+	 */
+	private Orientation orientation;
+	
+	/**
 	 * Constructs a new ship
 	 * 
 	 * @param type The type of the ship
 	 * @param x The x position of the ship
 	 * @param y The y position of the ship
+	 * @param orientation the orientation of the ship
 	 */
-	public Ship(ShipType type, int x, int y)
+	public Ship(ShipType type, int x, int y, Orientation orientation)
 	{
 		if (type == null)
 		{
@@ -53,6 +59,7 @@ public class Ship
 		this.type = type;
 		this.x = x;
 		this.y = y;
+		this.orientation = orientation;
 		switch (type)
 		{
 			case AIRCRAFT_CARRIER:
@@ -129,5 +136,14 @@ public class Ship
 	public int getY()
 	{
 		return y;
+	}
+	
+	/**
+	 * Returns the orientation of the ship
+	 * @return the orientation of the ship
+	 */
+	public Orientation getOrientation()
+	{
+		return orientation;
 	}
 }
