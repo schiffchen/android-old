@@ -17,6 +17,3 @@ local.properties
 
 # Eclipse project files
 .project
-
-# Linked folders
-resources/me/battleship/sounds
