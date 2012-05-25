@@ -2,6 +2,7 @@ package me.battleship.communication;
 
 
 import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
@@ -43,12 +44,13 @@ public class Connection
 	 * Creates a new connection using the specified login credentials
 	 * 
 	 * @param jid the jabber id
+	 * @param port the port to connect to
 	 * @param password the password
 	 */
-	public Connection(JID jid, String password)
+	public Connection(JID jid, int port, String password)
 	{
 		this.jid = jid;
-		connection = new XMPPConnection(jid.getDomain());
+		connection = new XMPPConnection(new ConnectionConfiguration(jid.getDomain(), port));
 		this.password = password;
 	}
 	
