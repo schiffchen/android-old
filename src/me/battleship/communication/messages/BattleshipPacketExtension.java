@@ -92,13 +92,18 @@ public class BattleshipPacketExtension implements PacketExtension
 	}
 	
 	/**
-	 * Sets the specified attribute.
+	 * Sets the specified attribute. Pass null as value to remove an attribute.
 	 * 
 	 * @param attribute the attribute
 	 * @param value the value
 	 */
 	public void setAttribute(String attribute, String value)
 	{
+		if (value == null)
+		{
+			attributes.remove(attribute);
+			return;
+		}
 		attributes.put(attribute, value);
 	}
 	
