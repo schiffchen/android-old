@@ -104,7 +104,7 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 			timer.cancel();
 			String opponentJID = attributes.get("jid");
 			String matchId = attributes.get("mid");
-			Log.i(LOG_TAG, "Assigned to: " + opponentJID + "; mid: " + matchId);
+			Log.i(LOG_TAG, "Assigned to: " + opponentJID + " mid: " + matchId);
 			try
 			{
 				chat.sendMessage(new QueueMessage(opponentJID, matchId));
