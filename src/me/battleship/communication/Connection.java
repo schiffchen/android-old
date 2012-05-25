@@ -17,7 +17,7 @@ public class Connection
 	/**
 	 * The connection
 	 */
-	private XMPPConnection connection;
+	XMPPConnection connection;
 	
 	/**
 	 * The Jabber id
