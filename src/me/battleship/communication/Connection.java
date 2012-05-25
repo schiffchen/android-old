@@ -1,6 +1,7 @@
 package me.battleship.communication;
 
 
+import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
@@ -70,5 +71,14 @@ public class Connection
 	public void disconnect()
 	{
 		connection.disconnect();
+	}
+	
+	/**
+	 * Returns the chat manager for the current connection
+	 * @return the chat manager
+	 */
+	public ChatManager getChatManager()
+	{
+		return connection.getChatManager();
 	}
 }
