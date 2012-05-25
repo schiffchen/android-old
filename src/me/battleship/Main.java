@@ -1,48 +1,49 @@
 package me.battleship;
 
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.XMPPConnection;
+import me.battleship.communication.Connection;
+import me.battleship.communication.JID;
+import me.battleship.communication.MatchmakerConnection;
+import me.battleship.communication.MatchmakerConnection.OpponentAssignedListener;
+
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 /**
  * The main activity
  * 
  * @author manuel
  */
-public class Main extends Activity
+public class Main extends Activity 
 {
-	private XMPPConnection connection; 
-
+	public static final String LOG_TAG = "Main";
+	
+	private Connection connection;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState); 
-		setContentView(R.layout.main);
-		ConnectionConfiguration config = new ConnectionConfiguration("battleship.me");
-		
-		connection = new XMPPConnection(config);
+		super.onCreate(savedInstanceState);
+		Log.i(LOG_TAG, "main activity started");
+		setContentView(R.layout.main); 
+		connection = new Connection(new JID(LoginCredentials.USERNAME), 80, LoginCredentials.PASSWORD);
 		try
 		{
 			connection.connect();
-			System.out.println("Connected - yay");
-			connection.login(LoginCredentials.USERNAME, LoginCredentials.PASSWORD, "battleshipme");
-			Chat chat = connection.getChatManager().createChat("manuel@battleship.me", new MessageListener()
+			MatchmakerConnection matchmakerConnection = new MatchmakerConnection(connection);
+			matchmakerConnection.queue(new OpponentAssignedListener()
 			{
 				
 				@Override
-				public void processMessage(Chat arg0, Message arg1)
+				public void onOpponentAssigned(String jid, String matchId)
 				{
-					System.out.println("Incoming message: "+arg1);
+					System.out.println("Opponent: " + jid);
+					System.out.println("Matchid: " + matchId);
 				}
 			});
-			chat.sendMessage("Blaaaah");
 		}
 		catch (XMPPException e)
 		{
