@@ -111,8 +111,7 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 			}
 			catch (XMPPException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.w(LOG_TAG, "Error while confirming assignment", e);
 			}
 			chat.removeMessageListener(this);
 			queueId = null;
