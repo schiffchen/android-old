@@ -2,6 +2,11 @@ package me.battleship.communication.messages;
 
 import org.jivesoftware.smack.packet.Message;
 
+/**
+ * A utility for handling messages
+ *
+ * @author Manuel Vögele
+ */
 public class MessageUtil
 {
 	/**
