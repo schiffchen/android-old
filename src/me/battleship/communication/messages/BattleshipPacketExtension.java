@@ -83,6 +83,25 @@ public class BattleshipPacketExtension implements PacketExtension
 	}
 	
 	/**
+	 * Returns the specified sub element or <code>null</code> if it's not avaliable
+	 * 
+	 * @param element the sub element type
+	 * @return the sub element
+	 */
+	public BattleshipPacketExtension getSubElement(ExtensionElements element)
+	{
+		
+		for (BattleshipPacketExtension subElement : subElements)
+		{
+			if (subElement.getElementName().equals(element.getElementName()))
+			{
+				return subElement;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Returns the sub elements of the specified element
 	 * @return a list of sub elements
 	 */
