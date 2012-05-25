@@ -1,10 +1,10 @@
 package me.battleship;
 
-import me.battleship.util.ViewFactory;
+import me.battleship.screen.LoginScreen;
+import me.battleship.screen.ScreenManager;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.FrameLayout;
 
 /**
  * The main activity
@@ -24,9 +24,7 @@ public class Main extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		Log.i(LOG_TAG, "main activity started");
-		FrameLayout frameLayout = new FrameLayout(this);
-		ViewFactory.createView(R.layout.login, frameLayout, this);
-		ViewManager.initialize(this, frameLayout);
+		ScreenManager.initialize(this, new LoginScreen());
 	}
 
 	@Override
