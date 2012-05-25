@@ -1,8 +1,15 @@
 package me.battleship.screen;
 
+import me.battleship.LoginCredentials;
 import me.battleship.R;
+import me.battleship.communication.Connection;
+import me.battleship.communication.JID;
 import me.battleship.util.ViewFactory;
+
+import org.jivesoftware.smack.XMPPException;
+
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -31,6 +38,24 @@ public class LoginScreen implements Screen, OnClickListener
 	@Override
 	public void onClick(View v)
 	{
-		// TODO: Implement onClick action
+		
+		Connection connection;
+		if (v.getId() == R.id.buttonLogin)
+		{
+			connection = new Connection(new JID(LoginCredentials.USERNAME), 80, LoginCredentials.PASSWORD);
+		}
+		else
+		{
+			connection = new Connection();
+		}
+		try
+		{
+			connection.connect();
+		}
+		catch (XMPPException e)
+		{
+			Log.e(LOG_TAG, "An exception occured while logging in", e);
+			connection.disconnect();
+		}
 	}
 }
