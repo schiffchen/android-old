@@ -24,6 +24,11 @@ public class Connection
 	public static final String LOG_TAG = "Connection";
 	
 	/**
+	 * The only instance of connection
+	 */
+	public static Connection INSTANCE;
+	
+	/**
 	 * The connection
 	 */
 	private XMPPConnection connection;
@@ -56,9 +61,22 @@ public class Connection
 	 */
 	public Connection(JID jid, int port, String password)
 	{
+		fillInstance();
 		this.jid = jid;
 		connection = new XMPPConnection(new ConnectionConfiguration(jid.getDomain(), port));
 		this.password = password;
+	}
+	
+	/**
+	 * This will assign the current instance to INSTANCE and closes the old one
+	 */
+	private void fillInstance()
+	{
+		if (INSTANCE != null)
+		{
+			INSTANCE.disconnect();
+		}
+		INSTANCE = this;
 	}
 	
 	/**
