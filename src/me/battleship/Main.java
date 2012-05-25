@@ -18,8 +18,14 @@ import android.util.Log;
  */
 public class Main extends Activity 
 {
+	/**
+	 * The tag for the logger
+	 */
 	public static final String LOG_TAG = "Main";
 	
+	/**
+	 * The connection
+	 */
 	private Connection connection;
 	
 	/** Called when the activity is first created. */

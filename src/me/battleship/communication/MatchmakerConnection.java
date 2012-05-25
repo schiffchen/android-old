@@ -22,8 +22,12 @@ import android.util.Log;
  * @author Manuel Vögele
  */
 public class MatchmakerConnection extends TimerTask implements MessageListener
-{
+{	
+	/**
+	 * The tag for the logger
+	 */
 	public static final String LOG_TAG = "MatchmakerConnection";
+	
 	/**
 	 * The jabber id of the matchmaker
 	 */

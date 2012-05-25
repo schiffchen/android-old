@@ -18,7 +18,11 @@ import android.util.Log;
  */
 public class Connection
 {
+	/**
+	 * The tag for the logger
+	 */
 	public static final String LOG_TAG = "Connection";
+	
 	/**
 	 * The connection
 	 */
