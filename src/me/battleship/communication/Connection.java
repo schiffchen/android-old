@@ -9,6 +9,8 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.Presence.Type;
 
+import android.util.Log;
+
 /**
  * A class for handling connections
  *
@@ -16,6 +18,7 @@ import org.jivesoftware.smack.packet.Presence.Type;
  */
 public class Connection
 {
+	public static final String LOG_TAG = "Connection";
 	/**
 	 * The connection
 	 */
@@ -61,6 +64,7 @@ public class Connection
 	 */
 	public void connect() throws XMPPException
 	{
+		Log.i(LOG_TAG, "Connecting to " + connection.getHost() + ":" + connection.getPort());
 		connection.connect();
 		String resource = (jid.getResource() != null ? jid.getResource() : "battleshipme");
 		connection.login(jid.getNode(), password, resource);
@@ -72,6 +76,7 @@ public class Connection
 	 */
 	public void disconnect()
 	{
+		Log.i(LOG_TAG, "Disconnecting from " + connection.getHost() + ":" + connection.getPort());
 		connection.disconnect();
 	}
 	

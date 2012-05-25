@@ -14,6 +14,8 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 
+import android.util.Log;
+
 /**
  * The connection to the matchmaker 
  *
@@ -21,6 +23,7 @@ import org.jivesoftware.smack.packet.Message;
  */
 public class MatchmakerConnection extends TimerTask implements MessageListener
 {
+	public static final String LOG_TAG = "MatchmakerConnection";
 	/**
 	 * The jabber id of the matchmaker
 	 */
@@ -64,8 +67,10 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	 */
 	public void queue(OpponentAssignedListener assignedListener) throws XMPPException
 	{
+		Log.i(LOG_TAG, "Queuing at matchmaker");
 		if (queueId != null)
 		{
+			Log.i(LOG_TAG, "Allready queued. Queuing aborted.");
 			return;
 		}
 		this.listener = assignedListener;
@@ -80,20 +85,26 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 		BattleshipPacketExtension queueing = extension.getSubElement(ExtensionElements.QUEUEING);
 		Map<String, String> attributes = queueing.getAttributes();
 		String action = attributes.get("action");
+		if (action == null)
+		{
+			return;
+		}
 		if (action.equals("success"))
 		{
 			queueId = attributes.get("id");
+			Log.i(LOG_TAG, "Received queue id " + queueId);
 			timer.scheduleAtFixedRate(this, 15000, 15000);
 		}
 		else if (action.equals("ping"))
 		{
-			System.out.println("Received ping.");
+			Log.i(LOG_TAG, "Received ping from Matchmaker");
 		}
 		else if (action.equals("assign"))
 		{
 			timer.cancel();
 			String opponentJID = attributes.get("jid");
 			String matchId = attributes.get("mid");
+			Log.i(LOG_TAG, "Assigned to: " + opponentJID + "; mid: " + matchId);
 			try
 			{
 				chat.sendMessage(new QueueMessage(opponentJID, matchId));
@@ -107,6 +118,10 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 			queueId = null;
 			listener.onOpponentAssigned(opponentJID, matchId);
 		}
+		else
+		{
+			Log.w(LOG_TAG, "Unknown message type: " + action);
+		}
 	}
 	
 	@Override
@@ -114,13 +129,12 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	{
 		try
 		{
+			Log.i(LOG_TAG, "Sending ping to Matchmaker");
 			chat.sendMessage(new QueueMessage(queueId));
-			System.out.println("Sending ping to matchmaker...");
 		}
 		catch (XMPPException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.w(LOG_TAG, "Error while sending ping to Matchmaker", e);
 		}
 	}
 	
