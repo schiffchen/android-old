@@ -6,18 +6,30 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.ViewAnimator;
 
-
+/**
+ * A class which manages the currently displayed view
+ *
+ * @author Manuel Vögele
+ */
 public class ViewManager
 {
+	/**
+	 * The tag for the logger
+	 */
 	public static final String LOG_TAG = "ViewManager";
 	
-	private Activity activity;
-	
+	/**
+	 * The animator for making the transitions
+	 */
 	private ViewAnimator animator;
 	
+	/**
+	 * Initializes the ViewManager using startView as initial view
+	 * @param activity the activity in which the view will be displayed
+	 * @param startView the view which will be initially showed
+	 */
 	private ViewManager(Activity activity, View startView)
 	{
-		this.activity = activity;
 		animator = new ViewAnimator(activity);
 		animator.addView(startView);
 		animator.setAnimateFirstView(false);
@@ -30,6 +42,11 @@ public class ViewManager
 		activity.setContentView(animator);
 	}
 	
+	/**
+	 * Changes the view to the passed view
+	 * 
+	 * @param view the new view
+	 */
 	public void setView(View view)
 	{
 		animator.addView(view);
@@ -37,8 +54,17 @@ public class ViewManager
 		animator.removeViewAt(0);
 	}
 	
+	/**
+	 * The only one instance of the ViewManager
+	 */
 	private static ViewManager instance;
 	
+	/**
+	 * Initializes the ViewManager
+	 * 
+	 * @param activity the activity for which the view should be managed
+	 * @param startView the view which is initialy displayed
+	 */
 	public static void initialize(Activity activity, View startView)
 	{
 		if (instance != null)
@@ -48,6 +74,10 @@ public class ViewManager
 		instance = new ViewManager(activity, startView);
 	}
 	
+	/**
+	 * Returns the only instance of ViewManager
+	 * @return the only instance of ViewManager
+	 */
 	public static ViewManager getInstance()
 	{
 		if (instance == null)
