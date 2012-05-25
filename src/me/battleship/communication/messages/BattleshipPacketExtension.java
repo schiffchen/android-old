@@ -15,14 +15,31 @@ import org.jivesoftware.smack.packet.PacketExtension;
  */
 public class BattleshipPacketExtension implements PacketExtension
 {
+	/**
+	 * The namespace for battleship messages
+	 */
 	public static final String NAMESPACE = "http://battleship.me/xmlns/";
 	
+	/**
+	 * The name of the element
+	 */
 	private String elementName;
 	
+	/**
+	 * The attributes of the element
+	 */
 	private Map<String, String> attributes;
 	
+	/**
+	 * The subelements of the element
+	 */
 	private List<BattleshipPacketExtension> subElements;
 	
+	/**
+	 * Creates a new element
+	 * 
+	 * @param element the type of the element
+	 */
 	public BattleshipPacketExtension(ExtensionElements element)
 	{
 		this.elementName = element.getElementName();
@@ -34,6 +51,11 @@ public class BattleshipPacketExtension implements PacketExtension
 		}
 	}
 	
+	/**
+	 * Creates a new element
+	 * 
+	 * @param elementName the name of the element
+	 */
 	public BattleshipPacketExtension(String elementName)
 	{
 		this.elementName = elementName;
@@ -51,21 +73,39 @@ public class BattleshipPacketExtension implements PacketExtension
 		return NAMESPACE;
 	}
 	
+	/**
+	 * Adds a sub element to this element
+	 * @param extension the sub element
+	 */
 	public void addSubElement(BattleshipPacketExtension extension)
 	{
 		subElements.add(extension);
 	}
 	
+	/**
+	 * Returns the sub elements of the specified element
+	 * @return a list of sub elements
+	 */
 	public List<BattleshipPacketExtension> getSubElements()
 	{
 		return subElements;
 	}
 	
+	/**
+	 * Sets the specified attribute.
+	 * 
+	 * @param attribute the attribute
+	 * @param value the value
+	 */
 	public void setAttribute(String attribute, String value)
 	{
 		attributes.put(attribute, value);
 	}
 	
+	/**
+	 * Returns the attributes
+	 * @return the attributes
+	 */
 	public Map<String, String> getAttributes()
 	{
 		return attributes;

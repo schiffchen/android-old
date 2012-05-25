@@ -6,8 +6,16 @@ import java.util.Map;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.EmbeddedExtensionProvider;
 
+/**
+ * The extension provider for parsing {@link BattleshipPacketExtension BattleshipPacketExtensions}
+ *
+ * @author Manuel Vögele
+ */
 public class BattleshipExtensionProvider extends EmbeddedExtensionProvider
 {
+	/**
+	 * The instance for this extension provider
+	 */
 	public static final BattleshipExtensionProvider INSTANCE = new BattleshipExtensionProvider();
 	
 	/**
@@ -18,6 +26,7 @@ public class BattleshipExtensionProvider extends EmbeddedExtensionProvider
 		// Nothing to do - only for making constructor private
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public PacketExtension createReturnExtension(String currentElement, String currentNamespace, Map<String, String> attributeMap, List<? extends PacketExtension> content)
 	{
