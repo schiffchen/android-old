@@ -2,6 +2,10 @@
 <resources>
     <string name="app_name">Schiffchen</string>
     
+    <string name="string_not_set">[no string set]</string>
+    
+    <string name="logging_in">Logging in…</string>
+    
     <string name="jabberid">Jabber ID</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
