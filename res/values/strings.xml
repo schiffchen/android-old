@@ -11,6 +11,10 @@
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="anonymous_login">Anonymous login</string>
+    <string name="logout">Logout</string>
+    
+    <string name="random_opponent">Random opponent</string>
+    <string name="searching_for_opponent">Searching for opponent…</string>
     
     <string name="aircraft_carrier">Aircraft carrier</string>
     <string name="battleship">Battleship</string>

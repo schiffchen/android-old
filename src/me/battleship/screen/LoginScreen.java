@@ -59,11 +59,11 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 	public void onClick(View v)
 	{
 		Builder builder = new AlertDialog.Builder(activity);
-		FrameLayout root = new FrameLayout(activity);
-		ViewFactory.createView(R.layout.progress_with_text, root, activity);
+		FrameLayout root = ViewFactory.createView(R.layout.progress_with_text, activity);
 		TextView label = (TextView) root.findViewById(R.id.progessText);
 		label.setText(R.string.logging_in);
 		builder.setView(root);
+		builder.setCancelable(false);
 		dialog = builder.show();
 		Connection connection;
 		if (v.getId() == R.id.buttonLogin)
@@ -82,7 +82,11 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 	{
 		dialog.dismiss();
 		dialog = null;
-		if (e != null)
+		if (e == null)
+		{
+			ScreenManager.setScreen(new BuddyOverview(), R.anim.left_out, R.anim.right_in);
+		}
+		else
 		{
 			Log.e(LOG_TAG, "Error while logging in", e);
 			Connection.INSTANCE.disconnect();

@@ -57,9 +57,9 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	 * Creates a new instance
 	 * @param connection the connection to use for the matchmaker connection
 	 */
-	public MatchmakerConnection(Connection connection)
+	public MatchmakerConnection()
 	{
-		this.chat = connection.connection.getChatManager().createChat(MATCHMAKER_JID, null);
+		this.chat = Connection.INSTANCE.connection.getChatManager().createChat(MATCHMAKER_JID, null);
 		timer = new Timer();
 	}
 	
@@ -69,7 +69,7 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	 * @param assignedListener the listener that will be called when an opponent was assigned
 	 * @throws XMPPException when an exception occurs while sending messages
 	 */
-	public void queue(OpponentAssignedListener assignedListener) throws XMPPException
+	public void queue(OpponentAssignedListener assignedListener)
 	{
 		Log.i(LOG_TAG, "Queuing at matchmaker");
 		if (queueId != null)
@@ -79,7 +79,14 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 		}
 		this.listener = assignedListener;
 		chat.addMessageListener(this);
-		chat.sendMessage(new QueueMessage());
+		try
+		{
+			chat.sendMessage(new QueueMessage());
+		}
+		catch (XMPPException e)
+		{
+			Log.e(LOG_TAG, "An error occured while queuing.", e);
+		}
 	}
 	
 	@Override
