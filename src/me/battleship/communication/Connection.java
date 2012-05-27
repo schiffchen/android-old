@@ -1,7 +1,6 @@
 package me.battleship.communication;
 
 
-import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -9,6 +8,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.Presence.Type;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 /**
@@ -31,17 +31,17 @@ public class Connection
 	/**
 	 * The connection
 	 */
-	private XMPPConnection connection;
+	XMPPConnection connection;
 	
 	/**
 	 * The Jabber id
 	 */
-	private JID jid;
+	JID jid;
 	
 	/**
 	 * The password
 	 */
-	private String password;
+	String password;
 
 	/**
 	 * Creates a new connection which is set to login anonymously
@@ -82,15 +82,46 @@ public class Connection
 	/**
 	 * Establishes a connection
 	 * 
-	 * @throws XMPPException if an error occurs while connecting
+	 * @param listener The listener called when operation is complete - if null nothing will be done and errors will be logged
 	 */
-	public void connect() throws XMPPException
+	public void connect(ConnectFinishedListener listener)
 	{
-		Log.i(LOG_TAG, "Connecting to " + connection.getHost() + ":" + connection.getPort());
-		connection.connect();
-		String resource = (jid.getResource() != null ? jid.getResource() : "battleshipme");
-		connection.login(jid.getNode(), password, resource);
-		connection.sendPacket(new Presence(Type.available, "ready", -128, Mode.available));
+		new AsyncTask<ConnectFinishedListener, Void, XMPPException>()
+		{
+			private ConnectFinishedListener listener;
+			
+			@Override
+			protected XMPPException doInBackground(ConnectFinishedListener... params)
+			{
+				this.listener = params[0];
+				try
+				{
+					Log.i(LOG_TAG, "Connecting to " + connection.getHost() + ":" + connection.getPort());
+					connection.connect();
+					String resource = (jid.getResource() != null ? jid.getResource() : "battleshipme");
+					connection.login(jid.getNode(), password, resource);
+					connection.sendPacket(new Presence(Type.available, "ready", -128, Mode.available));
+					return null;
+				}
+				catch (XMPPException e)
+				{
+					return e;
+				}
+			}
+			
+			@Override
+			protected void onPostExecute(XMPPException result)
+			{
+				if (listener != null)
+				{
+					listener.onConnectFinished(result);
+				}
+				else if (result != null)
+				{
+					Log.e(LOG_TAG, "Error while logging in", result);
+				}
+			}
+		}.execute(listener);
 	}
 	
 	/**
@@ -100,14 +131,5 @@ public class Connection
 	{
 		Log.i(LOG_TAG, "Disconnecting from " + connection.getHost() + ":" + connection.getPort());
 		connection.disconnect();
-	}
-	
-	/**
-	 * Returns the chat manager for the current connection
-	 * @return the chat manager
-	 */
-	public ChatManager getChatManager()
-	{
-		return connection.getChatManager();
 	}
 }

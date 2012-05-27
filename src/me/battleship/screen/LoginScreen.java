@@ -2,6 +2,7 @@ package me.battleship.screen;
 
 import me.battleship.LoginCredentials;
 import me.battleship.R;
+import me.battleship.communication.ConnectFinishedListener;
 import me.battleship.communication.Connection;
 import me.battleship.communication.JID;
 import me.battleship.util.ViewFactory;
@@ -11,6 +12,7 @@ import org.jivesoftware.smack.XMPPException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,17 +24,21 @@ import android.widget.TextView;
  *
  * @author Manuel Vögele
  */
-public class LoginScreen implements Screen, OnClickListener
+public class LoginScreen implements Screen, OnClickListener, ConnectFinishedListener
 {
 	public static final String LOG_TAG = "LoginScreen";
 	
 	private Activity activity;
 	
+	private volatile Dialog dialog;
+	
+	private volatile View view;
+	
 	@Override
 	public View getView(@SuppressWarnings("hiding") Activity activity)
 	{
 		this.activity = activity;
-		View view = ViewFactory.createView(R.layout.login, activity);
+		view = ViewFactory.createView(R.layout.login, activity);
 		Button loginButton = (Button) view.findViewById(R.id.buttonLogin);
 		loginButton.setOnClickListener(this);
 		Button anonymousLoginButton = (Button) view.findViewById(R.id.buttonAnonymousLogin);
@@ -49,7 +55,7 @@ public class LoginScreen implements Screen, OnClickListener
 		TextView label = (TextView) root.findViewById(R.id.progessText);
 		label.setText(R.string.logging_in);
 		builder.setView(root);
-		builder.show();
+		dialog = builder.show();
 		Connection connection;
 		if (v.getId() == R.id.buttonLogin)
 		{
@@ -59,14 +65,30 @@ public class LoginScreen implements Screen, OnClickListener
 		{
 			connection = new Connection();
 		}
-		try
+		connection.connect(this);
+	}
+
+	@Override
+	public void onConnectFinished(XMPPException e)
+	{
+		dialog.dismiss();
+		dialog = null;
+		if (e != null)
 		{
-			connection.connect();
-		}
-		catch (XMPPException e)
-		{
-			Log.e(LOG_TAG, "An exception occured while logging in", e);
-			connection.disconnect();
+			Log.e(LOG_TAG, "Error while logging in", e);
+			Connection.INSTANCE.disconnect();
+			String errorMessage;
+			if (e.getMessage().contains("authentication failed"))
+			{
+				errorMessage = activity.getString(R.string.authentication_failed);
+			}
+			else
+			{
+				errorMessage = e.getWrappedThrowable().getMessage();
+			}
+			TextView textView = (TextView) view.findViewById(R.id.errorMessage);
+			textView.setText(errorMessage);
+			return;
 		}
 	}
 }

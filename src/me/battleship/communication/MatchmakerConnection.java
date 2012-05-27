@@ -59,7 +59,7 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	 */
 	public MatchmakerConnection(Connection connection)
 	{
-		this.chat = connection.getChatManager().createChat(MATCHMAKER_JID, null);
+		this.chat = connection.connection.getChatManager().createChat(MATCHMAKER_JID, null);
 		timer = new Timer();
 	}
 	
