@@ -2,7 +2,6 @@ package me.battleship.screen;
 
 import android.app.Activity;
 import android.util.Log;
-import android.view.animation.AlphaAnimation;
 import android.widget.ViewAnimator;
 
 /**
@@ -37,13 +36,7 @@ public class ScreenManager
 		this.activity = activity;
 		animator = new ViewAnimator(activity);
 		animator.addView(startScreen.getView(activity));
-		animator.setAnimateFirstView(false);
-		AlphaAnimation animation = new AlphaAnimation(1.0f, 0.0f);
-		animation.setDuration(1000);
-		animator.setOutAnimation(animation);
-		animation = new AlphaAnimation(0.0f, 1.0f);
-		animation.setDuration(1000);
-		animator.setInAnimation(animation);
+		animator.setAnimateFirstView(true);
 		activity.setContentView(animator);
 	}
 	
@@ -51,12 +44,16 @@ public class ScreenManager
 	 * Changes the view to the passed view
 	 * 
 	 * @param screen the new screen
+	 * @param outAnimation the animation to animate the current view out
+	 * @param inAnimation the animation to animate the new view in
 	 */
-	private void doSetScreen(Screen screen)
+	private void doSetScreen(Screen screen, int outAnimation, int inAnimation)
 	{
+		animator.setOutAnimation(activity, outAnimation);
+		animator.setInAnimation(activity, inAnimation);
 		animator.addView(screen.getView(activity));
 		animator.showNext();
-		animator.removeViewAt(0);
+//		animator.removeViewAt(0);
 	}
 	
 	/**
@@ -83,10 +80,12 @@ public class ScreenManager
 	 * Changes the view to the passed view
 	 * 
 	 * @param screen the new screen
+	 * @param outAnimation the animation to animate the current view out
+	 * @param inAnimation the animation to animate the new view in
 	 */
-	public static void setScreen(Screen screen)
+	public static void setScreen(Screen screen, int outAnimation, int inAnimation)
 	{
-		getInstance().doSetScreen(screen);
+		getInstance().doSetScreen(screen, outAnimation, inAnimation);
 	}
 	
 	/**
