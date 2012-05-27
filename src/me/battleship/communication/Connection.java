@@ -82,12 +82,15 @@ public class Connection
 	/**
 	 * Establishes a connection
 	 * 
-	 * @param listener The listener called when operation is complete - if null nothing will be done and errors will be logged
+	 * @param connectFinishedListener The listener called when operation is complete - if null nothing will be done and errors will be logged
 	 */
-	public void connect(ConnectFinishedListener listener)
+	public void connect(ConnectFinishedListener connectFinishedListener)
 	{
 		new AsyncTask<ConnectFinishedListener, Void, XMPPException>()
 		{
+			/**
+			 * The listener that will be used after connecting
+			 */
 			private ConnectFinishedListener listener;
 			
 			@Override
@@ -121,7 +124,7 @@ public class Connection
 					Log.e(LOG_TAG, "Error while logging in", result);
 				}
 			}
-		}.execute(listener);
+		}.execute(connectFinishedListener);
 	}
 	
 	/**

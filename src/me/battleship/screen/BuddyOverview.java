@@ -21,6 +21,11 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * A screen offering to play against a buddy or a random opponent or to log out 
+ *
+ * @author Manuel Vögele
+ */
 public class BuddyOverview implements Screen, OnClickListener
 {
 	@Override
@@ -41,16 +46,37 @@ public class BuddyOverview implements Screen, OnClickListener
 		ScreenManager.setScreen(new LoginScreen(), R.anim.right_out, R.anim.left_in);
 	}
 	
+	/**
+	 * The adapter for collecting data for the buddy list 
+	 *
+	 * @author Manuel Vögele
+	 */
 	private class BuddyListAdapter extends BaseAdapter implements OnClickListener, OpponentAssignedListener
 	{
+		/**
+		 * A list containing the users buddys
+		 */
 		private List<String> buddys;
 		
+		/**
+		 * The context
+		 */
 		private final Activity activity;
 		
+		/**
+		 * The id of the view containing the selection for 'random opponent'
+		 */
 		int randomOpponentId;
 		
+		/**
+		 * The dialog showing the progress
+		 */
 		Dialog dialog;
 		
+		/**
+		 * Instantiates a new BuddyListAdapter
+		 * @param activity the context
+		 */
 		public BuddyListAdapter(Activity activity)
 		{
 			this.activity = activity;
@@ -133,6 +159,10 @@ public class BuddyOverview implements Screen, OnClickListener
 			startGame(jid);
 		}
 		
+		/**
+		 * Starts a game against the specified opponent
+		 * @param opponentJID the jabber id of the opponent
+		 */
 		public void startGame(String opponentJID)
 		{
 			dialog.dismiss();

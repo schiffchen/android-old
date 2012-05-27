@@ -55,7 +55,6 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	
 	/**
 	 * Creates a new instance
-	 * @param connection the connection to use for the matchmaker connection
 	 */
 	public MatchmakerConnection()
 	{
@@ -67,7 +66,6 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	 * Adds the client to the queue on the matchmaker
 	 * 
 	 * @param assignedListener the listener that will be called when an opponent was assigned
-	 * @throws XMPPException when an exception occurs while sending messages
 	 */
 	public void queue(OpponentAssignedListener assignedListener)
 	{

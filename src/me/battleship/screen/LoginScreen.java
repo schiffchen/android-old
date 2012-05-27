@@ -27,16 +27,34 @@ import android.widget.TextView;
  */
 public class LoginScreen implements Screen, OnClickListener, ConnectFinishedListener
 {
+	/**
+	 * The log tag
+	 */
 	public static final String LOG_TAG = "LoginScreen";
 	
+	/**
+	 * The context
+	 */
 	private Activity activity;
 	
+	/**
+	 * A dialog for showing the progress
+	 */
 	private volatile Dialog dialog;
 	
+	/**
+	 * The main view of this screen
+	 */
 	private volatile View view;
 	
+	/**
+	 * The text field for the jabber id
+	 */
 	private EditText jabberid;
 	
+	/**
+	 * The text field for the password
+	 */
 	private EditText password;
 	
 	@Override
