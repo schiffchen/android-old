@@ -52,7 +52,7 @@ public class ScreenManager
 	 * 
 	 * @param screen the new screen
 	 */
-	public void setScreen(Screen screen)
+	private void doSetScreen(Screen screen)
 	{
 		animator.addView(screen.getView(activity));
 		animator.showNext();
@@ -80,10 +80,20 @@ public class ScreenManager
 	}
 	
 	/**
+	 * Changes the view to the passed view
+	 * 
+	 * @param screen the new screen
+	 */
+	public static void setScreen(Screen screen)
+	{
+		getInstance().doSetScreen(screen);
+	}
+	
+	/**
 	 * Returns the only instance of ViewManager
 	 * @return the only instance of ViewManager
 	 */
-	public static ScreenManager getInstance()
+	private static ScreenManager getInstance()
 	{
 		if (instance == null)
 		{
