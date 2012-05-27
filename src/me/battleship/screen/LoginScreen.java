@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 /**
@@ -34,11 +35,19 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 	
 	private volatile View view;
 	
+	private EditText jabberid;
+	
+	private EditText password;
+	
 	@Override
 	public View getView(@SuppressWarnings("hiding") Activity activity)
 	{
 		this.activity = activity;
 		view = ViewFactory.createView(R.layout.login, activity);
+		jabberid = (EditText) view.findViewById(R.id.editJabberId);
+		jabberid.setText(LoginCredentials.USERNAME);
+		password = (EditText) view.findViewById(R.id.editPassword);
+		password.setText(LoginCredentials.PASSWORD);
 		Button loginButton = (Button) view.findViewById(R.id.buttonLogin);
 		loginButton.setOnClickListener(this);
 		Button anonymousLoginButton = (Button) view.findViewById(R.id.buttonAnonymousLogin);
@@ -59,7 +68,7 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		Connection connection;
 		if (v.getId() == R.id.buttonLogin)
 		{
-			connection = new Connection(new JID(LoginCredentials.USERNAME), 80, LoginCredentials.PASSWORD);
+			connection = new Connection(new JID(jabberid.getText().toString()), 80, password.getText().toString());
 		}
 		else
 		{
