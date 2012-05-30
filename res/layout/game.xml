@@ -4,16 +4,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/background" >
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/playgroundGrid"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true" 
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
-        android:background="@drawable/border" >
-
-    </RelativeLayout>
+        android:background="@drawable/border" />
 
 </RelativeLayout>

@@ -5,9 +5,8 @@ import me.battleship.util.ViewFactory;
 import android.app.Activity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
 
 public class Game implements Screen
 {
@@ -19,45 +18,20 @@ public class Game implements Screen
 	public View getView(Activity activity)
 	{
 		View root = ViewFactory.createView(R.layout.game, activity);
-		RelativeLayout playgroundView = (RelativeLayout) root.findViewById(R.id.playgroundGrid);
-		View leftView = null;
-		View lastView = null;
+		LinearLayout playgroundView = (LinearLayout) root.findViewById(R.id.playgroundGrid);
 		for (int y = 0;y < SIZE;y++)
 		{
+			LinearLayout row = new LinearLayout(activity);
+			row.setOrientation(LinearLayout.HORIZONTAL);
+			row.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			playgroundView.addView(row);
 			for (int x = 0;x < SIZE;x++)
 			{
-				View layout = new Button(activity);
-				layout.setBackgroundResource(R.drawable.ic_launcher);
-				@SuppressWarnings("static-access")
-				LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				if (x == 0)
-				{
-					params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-					leftView = layout;
-				}
-				else
-				{
-					params.addRule(RelativeLayout.RIGHT_OF, lastView.getId());
-				}
-				if (x == SIZE - 1)
-				{
-					params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				}
-				if (y == 0)
-				{
-					params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-				}
-				else
-				{
-					params.addRule(RelativeLayout.BELOW, leftView.getId());
-				}
-				if (y == SIZE - 1)
-				{
-					params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-				}
-				layout.setLayoutParams(params);
-				lastView = layout;
-				playgroundView.addView(layout);
+				GridCellView gridCellView = new GridCellView(activity);
+				gridCellView.setLayoutParams(new android.widget.LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
+				gridCellView.setBackgroundResource(R.drawable.border);
+				gridCellView.setOnClickListener(new FieldClickListener(x, y));
+				row.addView(gridCellView);
 			}
 		}
 		return root;
