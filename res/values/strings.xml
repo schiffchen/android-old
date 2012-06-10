@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Schiffchen</string>
+    <string name="app_name">Battleship.me</string>
     
     <string name="string_not_set">[no string set]</string>
     
