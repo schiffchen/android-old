@@ -128,7 +128,7 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 		}
 		else
 		{
-			Log.w(LOG_TAG, "Unknown message type: " + action);
+			Log.w(LOG_TAG, "Unknown message type: " + action + "\nMessage:\n" + arg1.toXML());
 		}
 	}
 	
