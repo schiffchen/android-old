@@ -12,6 +12,18 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
-        android:background="@drawable/border" />
+        android:background="@drawable/border"
+        />
+
+    <FrameLayout
+        android:id="@+id/topArea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/playgroundGrid"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        />
 
 </RelativeLayout>

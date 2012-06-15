@@ -11,7 +11,8 @@ import org.jivesoftware.smack.provider.ProviderManager;
 public enum ExtensionElements
 {
 	BATTLESHIP("battleship"),
-	QUEUEING("queueing");
+	QUEUEING("queueing"),
+	DICEROLL("diceroll");
 	
 	/**
 	 * The name of the element as used in xml files

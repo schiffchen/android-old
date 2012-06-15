@@ -19,12 +19,12 @@ public class ScreenManager
 	/**
 	 * The animator for making the transitions
 	 */
-	private ViewAnimator animator;
+	ViewAnimator animator;
 
 	/**
 	 * The activity for which the screens are handled
 	 */
-	private final Activity activity;
+	final Activity activity;
 	
 	/**
 	 * Initializes the ViewManager using startView as initial view
@@ -47,13 +47,20 @@ public class ScreenManager
 	 * @param outAnimation the animation to animate the current view out
 	 * @param inAnimation the animation to animate the new view in
 	 */
-	private void doSetScreen(Screen screen, int outAnimation, int inAnimation)
+	private void doSetScreen(final Screen screen, final int outAnimation, final int inAnimation)
 	{
-		animator.setOutAnimation(activity, outAnimation);
-		animator.setInAnimation(activity, inAnimation);
-		animator.addView(screen.getView(activity));
-		animator.showNext();
-//		animator.removeViewAt(0);
+		activity.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				animator.setOutAnimation(activity, outAnimation);
+				animator.setInAnimation(activity, inAnimation);
+				animator.addView(screen.getView(activity));
+				animator.showNext();
+				animator.removeViewAt(0);
+			}
+		});
 	}
 	
 	/**

@@ -7,6 +7,7 @@ import me.battleship.R;
 import me.battleship.communication.Connection;
 import me.battleship.communication.MatchmakerConnection;
 import me.battleship.communication.MatchmakerConnection.OpponentAssignedListener;
+import me.battleship.communication.OpponentConnection;
 import me.battleship.util.ViewFactory;
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
@@ -165,9 +166,10 @@ public class BuddyOverview implements Screen, OnClickListener
 		 */
 		public void startGame(String opponentJID)
 		{
+			Game game = new Game(new OpponentConnection(opponentJID));
 			dialog.dismiss();
 			dialog = null;
-			System.out.println("Opponent: " + opponentJID);
+			ScreenManager.setScreen(game, R.anim.left_out, R.anim.right_in);
 		}
 	}
 }
