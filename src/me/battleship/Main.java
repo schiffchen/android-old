@@ -1,5 +1,6 @@
 package me.battleship;
 
+import me.battleship.communication.Connection;
 import me.battleship.screen.LoginScreen;
 import me.battleship.screen.ScreenManager;
 import android.app.Activity;
@@ -31,5 +32,6 @@ public class Main extends Activity
 	protected void onDestroy()
 	{
 		super.onDestroy();
+		Connection.INSTANCE.disconnect();
 	}
 }
