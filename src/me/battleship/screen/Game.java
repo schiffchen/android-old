@@ -1,7 +1,6 @@
 package me.battleship.screen;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,17 +12,23 @@ import me.battleship.communication.OpponentConnection;
 import me.battleship.communication.OpponentConnection.GameStartListener;
 import me.battleship.util.ViewFactory;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
 
 /**
- * This is where the match takes place 
- *
+ * This is where the match takes place
+ * 
  * @author Manuel Vögele
  */
 public class Game implements Screen, GameStartListener
@@ -36,7 +41,7 @@ public class Game implements Screen, GameStartListener
 	/**
 	 * A list containing the ships which have to be placed on the playground
 	 */
-	private List<ShipType> shipsToPlace;
+	List<ShipType> shipsToPlace;
 
 	/**
 	 * The root view
@@ -59,14 +64,25 @@ public class Game implements Screen, GameStartListener
 	private final OpponentConnection connection;
 
 	/**
+	 * A dialog displayed while waiting for the enemy
+	 */
+	private AlertDialog waitingDialog;
+
+	/**
 	 * Instantiates a new Game
-	 * @param connection the connection to the opponent
+	 * 
+	 * @param connection
+	 *           the connection to the opponent
 	 */
 	public Game(OpponentConnection connection)
 	{
 		this.connection = connection;
-		List<ShipType> ships = Arrays.asList(ShipType.AIRCRAFT_CARRIER, ShipType.BATTLESHIP, ShipType.SUBMARINE, ShipType.SUBMARINE, ShipType.DESTROYER);
-		shipsToPlace = new ArrayList<ShipType>(ships);
+		shipsToPlace = new ArrayList<ShipType>(5);
+		shipsToPlace.add(ShipType.AIRCRAFT_CARRIER);
+		shipsToPlace.add(ShipType.BATTLESHIP);
+		shipsToPlace.add(ShipType.SUBMARINE);
+		shipsToPlace.add(ShipType.SUBMARINE);
+		shipsToPlace.add(ShipType.DESTROYER);
 	}
 
 	@Override
@@ -75,6 +91,7 @@ public class Game implements Screen, GameStartListener
 		this.activity = activity;
 		root = ViewFactory.createView(R.layout.game, activity);
 		playgroundView = (RelativeLayout) root.findViewById(R.id.playgroundGrid);
+		FieldTouchListener fieldTouchListener = new FieldTouchListener();
 		for (int y = 0;y < SIZE;y++)
 		{
 			for (int x = 0;x < SIZE;x++)
@@ -100,7 +117,7 @@ public class Game implements Screen, GameStartListener
 				cell.setLayoutParams(layoutParams);
 				int id = getViewId(x, y);
 				cell.setId(id);
-				cell.setOnClickListener(new FieldClickListener(x, y));
+				cell.setOnTouchListener(fieldTouchListener);
 				cell.setBackgroundResource(R.drawable.border);
 				playgroundView.addView(cell);
 			}
@@ -112,13 +129,39 @@ public class Game implements Screen, GameStartListener
 	/**
 	 * Returns the id of the view at the specified position
 	 * 
-	 * @param x the x position
-	 * @param y the y position
+	 * @param x
+	 *           the x position
+	 * @param y
+	 *           the y position
 	 * @return the id of the view at the specified position
 	 */
-	private static int getViewId(int x, int y)
+	static int getViewId(int x, int y)
 	{
 		return y * SIZE + x + 1;
+	}
+	
+	/**
+	 * Returns the x position of the specified view id
+	 * 
+	 * @param id
+	 *           the view id
+	 * @return the x position of the specified view id
+	 */
+	static int getXFromId(int id)
+	{
+		return (id - 1) % SIZE;
+	}
+	
+	/**
+	 * Returns the y position of the specified view id
+	 * 
+	 * @param id
+	 *           the view id
+	 * @return the y position of the specified view id
+	 */
+	static int getYFromId(int id)
+	{
+		return (id - 1) / SIZE;
 	}
 
 	/**
@@ -129,23 +172,36 @@ public class Game implements Screen, GameStartListener
 		FrameLayout topArea = (FrameLayout) root.findViewById(R.id.topArea);
 		topArea.removeAllViews();
 		Iterator<ShipType> iterator = shipsToPlace.iterator();
-		if (iterator.hasNext()) {
+		if (iterator.hasNext())
+		{
 			ImageView imageView = new ImageView(activity);
 			int drawable = new Ship(iterator.next(), 0, 0, Orientation.HORIZONTAL).getDrawable();
 			imageView.setImageResource(drawable);
+			imageView.setOnClickListener(new SwitchNextShipListener());
 			topArea.addView(imageView);
 		}
 		else
 		{
-			connection.sendDiceroll(this);
-			// TODO
+			Button button = new Button(activity);
+			button.setText(R.string.ready);
+			button.setOnClickListener(new OnClickListener()
+			{
+				@Override
+				public void onClick(View view)
+				{
+					((ViewGroup)view.getParent()).removeView(view);
+					sendDiceroll();
+				}
+			});
+			topArea.addView(button);
 		}
 	}
 
 	/**
 	 * Returns the LayoutParams for the specified ship
 	 * 
-	 * @param ship the ship
+	 * @param ship
+	 *           the ship
 	 * @return the layout params for the ship
 	 */
 	private static RelativeLayout.LayoutParams getLayoutParamsForShip(Ship ship)
@@ -172,64 +228,146 @@ public class Game implements Screen, GameStartListener
 		layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, getViewId(endX, endY));
 		return layoutParams;
 	}
-	
+
 	/**
 	 * Place a ship at the specified position
 	 * 
-	 * @param x the x position
-	 * @param y the y position
+	 * @param x
+	 *           the x position
+	 * @param y
+	 *           the y position
+	 * @param orientation
+	 *           the orientation of the ship
 	 */
-	void placeShip(int x, int y) {
+	void placeShip(int x, int y, Orientation orientation)
+	{
 		Iterator<ShipType> iterator = shipsToPlace.iterator();
 		ShipType type = iterator.next();
 		iterator.remove();
 		previewNext();
-		Ship ship = new Ship(type, x, y, Orientation.VERTICAL);
+		Ship ship = new Ship(type, x, y, orientation);
 		ImageView imageView = new ImageView(activity);
 		imageView.setImageResource(ship.getDrawable());
 		imageView.setLayoutParams(getLayoutParamsForShip(ship));
 		playgroundView.addView(imageView);
 	}
+	
+	/**
+	 * Sends a diceroll to the enemy
+	 */
+	void sendDiceroll()
+	{
+		Builder builder = new AlertDialog.Builder(activity);
+		builder.setCancelable(false);
+		FrameLayout view = ViewFactory.createView(R.layout.progress_with_text, activity);
+		TextView text = (TextView) view.findViewById(R.id.progessText);
+		text.setText(R.string.waiting_for_opponent);
+		builder.setView(view);
+		waitingDialog = builder.show();
+		connection.sendDiceroll(this);
+	}
 
 	@Override
 	public void onGameStart(boolean yourturn)
 	{
+		waitingDialog.dismiss();
+		waitingDialog = null;
 		System.out.println("Game started. " + yourturn);
 	}
 
 	/**
-	 * A listener called when a field is clicked 
+	 * A listener called when a field is clicked
+	 * 
+	 * @author Manuel Vögele
+	 */
+	private class FieldTouchListener implements OnTouchListener
+	{		
+		/**
+		 * The x position at which the gesture started
+		 */
+		private float startx;
+		
+		/**
+		 * The y position at which the gesture started
+		 */
+		private float starty;
+		
+		/**
+		 * Instantiates a new FieldTouchListener
+		 */
+		public FieldTouchListener()
+		{
+			startx = Float.NaN;
+			starty = Float.NaN;
+		}
+		
+		@Override
+		public boolean onTouch(View view, MotionEvent event)
+		{
+			float eventx = event.getX();
+			float eventy = event.getY();
+			if (event.getAction() == MotionEvent.ACTION_DOWN)
+			{
+				startx = eventx;
+				starty = eventy;
+			}
+			else if (event.getAction() == MotionEvent.ACTION_UP)
+			{
+				float xdist = Math.abs(startx - eventx);
+				float ydist = Math.abs(starty - eventy);
+				int shipsize = Ship.getSizeForType(shipsToPlace.iterator().next()) - 1;
+				Orientation orientation;
+				int x = getXFromId(view.getId());
+				int y = getYFromId(view.getId());
+				if (xdist > ydist)
+				{
+					x = (startx <= eventx ? x : x - shipsize);
+					orientation = Orientation.HORIZONTAL;
+				}
+				else
+				{
+					y = (starty <= eventy ? y : y - shipsize);
+					orientation = Orientation.VERTICAL;
+				}
+				startx = Float.NaN;
+				starty = Float.NaN;
+				placeShip(x, y, orientation);
+			}
+			return true;
+		}
+	}
+	
+	/**
+	 * A listener switching to the next ship to set 
 	 *
 	 * @author Manuel Vögele
 	 */
-	private class FieldClickListener implements OnClickListener
+	private class SwitchNextShipListener implements OnClickListener
 	{
 		/**
-		 * The x position of the field
+		 * Instantiates a new SwitchNextShipListener
 		 */
-		private final int x;
-		
-		/**
-		 * The y position of the field
-		 */
-		private final int y;
-
-		/**
-		 * Initializes a new FieldClickListener
-		 * 
-		 * @param x the x position of the field
-		 * @param y the y position of the field
-		 */
-		public FieldClickListener(int x, int y)
+		public SwitchNextShipListener()
 		{
-			this.x = x;
-			this.y = y;
+			// Nothing to do
 		}
-
+		
 		@Override
 		public void onClick(View v)
 		{
-			placeShip(x, y);
+			Iterator<ShipType> iterator = shipsToPlace.iterator();
+			ShipType next = iterator.next();
+			int count = 0;
+			do
+			{
+				iterator.remove();
+				count++;
+			} while (iterator.next() == next);
+			for (int i = 0;i < count;i++)
+			{
+				shipsToPlace.add(next);
+			}
+			previewNext();
 		}
 	}
 }

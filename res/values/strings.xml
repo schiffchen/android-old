@@ -15,6 +15,9 @@
     
     <string name="random_opponent">Random opponent</string>
     <string name="searching_for_opponent">Searching for opponent…</string>
+    <string name="waiting_for_opponent">Waiting for opponent…</string>
+    
+    <string name="ready">Ready</string>
     
     <string name="aircraft_carrier">Aircraft carrier</string>
     <string name="battleship">Battleship</string>
