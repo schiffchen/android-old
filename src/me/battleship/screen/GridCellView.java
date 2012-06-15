@@ -3,10 +3,22 @@ package me.battleship.screen;
 import android.content.Context;
 import android.widget.FrameLayout;
 
+/**
+ * A view representing a grid cell 
+ *
+ * @author Manuel Vögele
+ */
 public class GridCellView extends FrameLayout
 {
+	/**
+	 * Variable to save the maximum height tried by the layout manager
+	 */
 	private static int height = 0;
 	
+	/**
+	 * Initializes a new GridCellView
+	 * @param context the context
+	 */
 	public GridCellView(Context context)
 	{
 		super(context);

@@ -21,20 +21,47 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
+/**
+ * This is where the match takes place 
+ *
+ * @author Manuel Vögele
+ */
 public class Game implements Screen, GameStartListener
 {
+	/**
+	 * The x and y size of the playground
+	 */
 	public static final int SIZE = 10;
 
+	/**
+	 * A list containing the ships which have to be placed on the playground
+	 */
 	private List<ShipType> shipsToPlace;
 
+	/**
+	 * The root view
+	 */
 	private View root;
 
+	/**
+	 * The grid to place the ships in
+	 */
 	private RelativeLayout playgroundView;
 
+	/**
+	 * The activity
+	 */
 	private Activity activity;
 
+	/**
+	 * The connection to the opponent
+	 */
 	private final OpponentConnection connection;
 
+	/**
+	 * Instantiates a new Game
+	 * @param connection the connection to the opponent
+	 */
 	public Game(OpponentConnection connection)
 	{
 		this.connection = connection;
@@ -43,7 +70,7 @@ public class Game implements Screen, GameStartListener
 	}
 
 	@Override
-	public View getView(Activity activity)
+	public View getView(@SuppressWarnings("hiding") Activity activity)
 	{
 		this.activity = activity;
 		root = ViewFactory.createView(R.layout.game, activity);
@@ -82,11 +109,21 @@ public class Game implements Screen, GameStartListener
 		return root;
 	}
 
-	private int getViewId(int x, int y)
+	/**
+	 * Returns the id of the view at the specified position
+	 * 
+	 * @param x the x position
+	 * @param y the y position
+	 * @return the id of the view at the specified position
+	 */
+	private static int getViewId(int x, int y)
 	{
 		return y * SIZE + x + 1;
 	}
 
+	/**
+	 * Generates the preview for the next ship to place
+	 */
 	void previewNext()
 	{
 		FrameLayout topArea = (FrameLayout) root.findViewById(R.id.topArea);
@@ -105,7 +142,13 @@ public class Game implements Screen, GameStartListener
 		}
 	}
 
-	private RelativeLayout.LayoutParams getShipPositionLayout(Ship ship)
+	/**
+	 * Returns the LayoutParams for the specified ship
+	 * 
+	 * @param ship the ship
+	 * @return the layout params for the ship
+	 */
+	private static RelativeLayout.LayoutParams getLayoutParamsForShip(Ship ship)
 	{
 		LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		int startX = ship.getX();
@@ -130,6 +173,12 @@ public class Game implements Screen, GameStartListener
 		return layoutParams;
 	}
 	
+	/**
+	 * Place a ship at the specified position
+	 * 
+	 * @param x the x position
+	 * @param y the y position
+	 */
 	void placeShip(int x, int y) {
 		Iterator<ShipType> iterator = shipsToPlace.iterator();
 		ShipType type = iterator.next();
@@ -138,7 +187,7 @@ public class Game implements Screen, GameStartListener
 		Ship ship = new Ship(type, x, y, Orientation.VERTICAL);
 		ImageView imageView = new ImageView(activity);
 		imageView.setImageResource(ship.getDrawable());
-		imageView.setLayoutParams(getShipPositionLayout(ship));
+		imageView.setLayoutParams(getLayoutParamsForShip(ship));
 		playgroundView.addView(imageView);
 	}
 
@@ -148,11 +197,29 @@ public class Game implements Screen, GameStartListener
 		System.out.println("Game started. " + yourturn);
 	}
 
+	/**
+	 * A listener called when a field is clicked 
+	 *
+	 * @author Manuel Vögele
+	 */
 	private class FieldClickListener implements OnClickListener
 	{
+		/**
+		 * The x position of the field
+		 */
 		private final int x;
+		
+		/**
+		 * The y position of the field
+		 */
 		private final int y;
 
+		/**
+		 * Initializes a new FieldClickListener
+		 * 
+		 * @param x the x position of the field
+		 * @param y the y position of the field
+		 */
 		public FieldClickListener(int x, int y)
 		{
 			this.x = x;

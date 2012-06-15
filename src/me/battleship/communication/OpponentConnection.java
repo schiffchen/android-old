@@ -15,20 +15,47 @@ import org.jivesoftware.smack.packet.Message;
 
 import android.util.Log;
 
+/**
+ * A class managing the connection to the opponent 
+ *
+ * @author Manuel Vögele
+ */
 public class OpponentConnection implements MessageListener
 {
+	/**
+	 * The tag for the logger
+	 */
 	public static final String LOG_TAG = "OpponentConnection";
 
+	/**
+	 * The own diceroll
+	 */
 	int diceroll;
 
+	/**
+	 * The diceroll of the opponent
+	 */
 	int opponentDiceroll;
 
+	/**
+	 * The random used to roll the dice
+	 */
 	Random random;
 
+	/**
+	 * The chat to communicate with the opponent
+	 */
 	private Chat chat;
 	
+	/**
+	 * The listener called when the game starts
+	 */
 	private GameStartListener listener;
 
+	/**
+	 * Establishes a new connection
+	 * @param opponentJID the jabber id of the opponent
+	 */
 	public OpponentConnection(String opponentJID)
 	{
 		diceroll = 0;
@@ -38,7 +65,11 @@ public class OpponentConnection implements MessageListener
 		chat = Connection.INSTANCE.connection.getChatManager().createChat(opponentJID, this);
 	}
 
-	public void sendDiceroll(GameStartListener listener)
+	/**
+	 * Sends a diceroll to the opponent
+	 * @param listener the listener that will be called when the game starts
+	 */
+	public void sendDiceroll(@SuppressWarnings("hiding") GameStartListener listener)
 	{
 		this.listener = listener;
 		diceroll = random.nextInt(5) + 1;
@@ -54,6 +85,9 @@ public class OpponentConnection implements MessageListener
 		}
 	}
 
+	/**
+	 * Compares the own diceroll and the opponents diceroll if both players have already rolled the dice
+	 */
 	private void checkDicerolls()
 	{
 		if (diceroll != 0 && opponentDiceroll != 0)
@@ -73,7 +107,7 @@ public class OpponentConnection implements MessageListener
 	}
 
 	@Override
-	public void processMessage(Chat chat, Message message)
+	public void processMessage(@SuppressWarnings("hiding") Chat chat, Message message)
 	{
 		BattleshipPacketExtension extension = MessageUtil.getPacketExtension(message, ExtensionElements.BATTLESHIP);
 		BattleshipPacketExtension dicerollExtension = extension.getSubElement(ExtensionElements.DICEROLL);
@@ -86,6 +120,11 @@ public class OpponentConnection implements MessageListener
 		}
 	}
 
+	/**
+	 * A listener called when both players have placed their ships and the game can start 
+	 *
+	 * @author Manuel Vögele
+	 */
 	public interface GameStartListener
 	{
 		/**
