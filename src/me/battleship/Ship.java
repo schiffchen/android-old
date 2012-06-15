@@ -1,6 +1,7 @@
 package me.battleship;
 
 import android.util.Log;
+import android.view.View;
 
 /**
  * A ship
@@ -48,6 +49,11 @@ public class Ship
 	 * The orientation of the ship
 	 */
 	private Orientation orientation;
+	
+	/**
+	 * The view displaying this ship
+	 */
+	private View view;
 
 	/**
 	 * Constructs a new ship
@@ -60,8 +66,10 @@ public class Ship
 	 *           The y position of the ship
 	 * @param orientation
 	 *           the orientation of the ship
+	 * @param view
+	 *           the view this ship is displayed in
 	 */
-	public Ship(ShipType type, int x, int y, Orientation orientation)
+	public Ship(ShipType type, int x, int y, Orientation orientation, View view)
 	{
 		if (type == null)
 		{
@@ -72,6 +80,7 @@ public class Ship
 		this.y = y;
 		this.orientation = orientation;
 		this.size = getSizeForType(type);
+		this.view = view;
 		switch (type)
 		{
 			case AIRCRAFT_CARRIER:
@@ -186,5 +195,14 @@ public class Ship
 	public Orientation getOrientation()
 	{
 		return orientation;
+	}
+	
+	/**
+	 * Returns the view displaying this ship
+	 * @return the view displaying this ship
+	 */
+	public View getView()
+	{
+		return view;
 	}
 }
