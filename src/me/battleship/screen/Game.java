@@ -1,7 +1,7 @@
 package me.battleship.screen;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import me.battleship.Orientation;
@@ -11,6 +11,7 @@ import me.battleship.ShipType;
 import me.battleship.communication.OpponentConnection;
 import me.battleship.communication.OpponentConnection.GameStartListener;
 import me.battleship.util.ViewFactory;
+import me.battleship.util.ViewUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -42,6 +43,11 @@ public class Game implements Screen, GameStartListener
 	 * A list containing the ships which have to be placed on the playground
 	 */
 	List<ShipType> shipsToPlace;
+	
+	/**
+	 * A array storing which ship is placed on the fieldsS
+	 */
+	Ship[][] fields = new Ship[SIZE][SIZE];
 
 	/**
 	 * The root view
@@ -77,7 +83,7 @@ public class Game implements Screen, GameStartListener
 	public Game(OpponentConnection connection)
 	{
 		this.connection = connection;
-		shipsToPlace = new ArrayList<ShipType>(5);
+		shipsToPlace = new LinkedList<ShipType>();
 		shipsToPlace.add(ShipType.AIRCRAFT_CARRIER);
 		shipsToPlace.add(ShipType.BATTLESHIP);
 		shipsToPlace.add(ShipType.SUBMARINE);
@@ -122,7 +128,7 @@ public class Game implements Screen, GameStartListener
 				playgroundView.addView(cell);
 			}
 		}
-		previewNext();
+		refreshPreview();
 		return root;
 	}
 
@@ -167,7 +173,7 @@ public class Game implements Screen, GameStartListener
 	/**
 	 * Generates the preview for the next ship to place
 	 */
-	void previewNext()
+	void refreshPreview()
 	{
 		FrameLayout topArea = (FrameLayout) root.findViewById(R.id.topArea);
 		topArea.removeAllViews();
@@ -175,7 +181,7 @@ public class Game implements Screen, GameStartListener
 		if (iterator.hasNext())
 		{
 			ImageView imageView = new ImageView(activity);
-			int drawable = new Ship(iterator.next(), 0, 0, Orientation.HORIZONTAL).getDrawable();
+			int drawable = new Ship(iterator.next(), 0, 0, Orientation.HORIZONTAL, null).getDrawable();
 			imageView.setImageResource(drawable);
 			imageView.setOnClickListener(new SwitchNextShipListener());
 			topArea.addView(imageView);
@@ -189,7 +195,7 @@ public class Game implements Screen, GameStartListener
 				@Override
 				public void onClick(View view)
 				{
-					((ViewGroup)view.getParent()).removeView(view);
+					ViewUtils.removeView(view);
 					sendDiceroll();
 				}
 			});
@@ -244,12 +250,56 @@ public class Game implements Screen, GameStartListener
 		Iterator<ShipType> iterator = shipsToPlace.iterator();
 		ShipType type = iterator.next();
 		iterator.remove();
-		previewNext();
-		Ship ship = new Ship(type, x, y, orientation);
+		refreshPreview();
 		ImageView imageView = new ImageView(activity);
+		Ship ship = new Ship(type, x, y, orientation, imageView);
 		imageView.setImageResource(ship.getDrawable());
 		imageView.setLayoutParams(getLayoutParamsForShip(ship));
+		for (int i = 0;i < ship.getSize();i++)
+		{
+			if (orientation == Orientation.HORIZONTAL) 
+			{
+				fields[x + i][y] = ship;
+			}
+			else
+			{
+				fields[x][y + i] = ship;
+			}
+		}
 		playgroundView.addView(imageView);
+	}
+	
+	/**
+	 * Removes a ship from the playground
+	 * @param x the x position of the ship
+	 * @param y the y position of the ship
+	 */
+	void removeShip(int x, int y)
+	{
+		Ship ship = fields[x][y];
+		for (int i = 0;i < ship.getSize();i++)
+		{
+			if (ship.getOrientation() == Orientation.HORIZONTAL)
+			{
+				fields[x + i][y] = null;
+			}
+			else
+			{
+				fields[x][y + i] = null;
+			}
+		}
+		ShipType type = ship.getType();
+		int index = shipsToPlace.indexOf(type);
+		if (index == -1)
+		{
+			shipsToPlace.add(type);
+		}
+		else
+		{
+			shipsToPlace.add(index, type);
+		}
+		refreshPreview();
+		ViewUtils.removeView(ship.getView());
 	}
 	
 	/**
@@ -304,6 +354,18 @@ public class Game implements Screen, GameStartListener
 		@Override
 		public boolean onTouch(View view, MotionEvent event)
 		{
+			int x = getXFromId(view.getId());
+			int y = getYFromId(view.getId());
+			if (fields[x][y] != null)
+			{
+				removeShip(x, y);
+				return false;
+			}
+			Iterator<ShipType> iterator = shipsToPlace.iterator();
+			if (!iterator.hasNext())
+			{
+				return false;
+			}
 			float eventx = event.getX();
 			float eventy = event.getY();
 			if (event.getAction() == MotionEvent.ACTION_DOWN)
@@ -315,10 +377,8 @@ public class Game implements Screen, GameStartListener
 			{
 				float xdist = Math.abs(startx - eventx);
 				float ydist = Math.abs(starty - eventy);
-				int shipsize = Ship.getSizeForType(shipsToPlace.iterator().next()) - 1;
+				int shipsize = Ship.getSizeForType(iterator.next()) - 1;
 				Orientation orientation;
-				int x = getXFromId(view.getId());
-				int y = getYFromId(view.getId());
 				if (xdist > ydist)
 				{
 					x = (startx <= eventx ? x : x - shipsize);
@@ -367,7 +427,7 @@ public class Game implements Screen, GameStartListener
 			{
 				shipsToPlace.add(next);
 			}
-			previewNext();
+			refreshPreview();
 		}
 	}
 }
