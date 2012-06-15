@@ -249,6 +249,8 @@ public class Game implements Screen, GameStartListener
 	{
 		Iterator<ShipType> iterator = shipsToPlace.iterator();
 		ShipType type = iterator.next();
+		if (!validateShipPos(x, y, orientation, type))
+			return;
 		iterator.remove();
 		refreshPreview();
 		ImageView imageView = new ImageView(activity);
@@ -270,6 +272,36 @@ public class Game implements Screen, GameStartListener
 	}
 	
 	/**
+	 * Validates if a ship with the specified orientation can be placed on field orientation
+	 * 
+	 * @param x the x position
+	 * @param y the y position
+	 * @param orientation the orientation of the ship
+	 * @param type the type of the ship
+	 * @return if the position is valid
+	 */
+	public boolean validateShipPos(int x, int y, Orientation orientation, ShipType type)
+	{
+		if (x < 0)
+			return false;
+		if (y < 0)
+			return false;
+		int size = Ship.getSizeForType(type);
+		if (orientation == Orientation.HORIZONTAL && x + size - 1 >= SIZE)
+			return false;
+		if (orientation == Orientation.VERTICAL && y + size - 1 >= SIZE)
+			return false;
+		for (int i = 0;i < size;i++)
+		{
+			if (orientation == Orientation.HORIZONTAL && fields[x + i][y] != null)
+				return false;
+			if (orientation == Orientation.VERTICAL && fields[x][y + i] != null)
+				return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * Removes a ship from the playground
 	 * @param x the x position of the ship
 	 * @param y the y position of the ship
@@ -277,6 +309,8 @@ public class Game implements Screen, GameStartListener
 	void removeShip(int x, int y)
 	{
 		Ship ship = fields[x][y];
+		x = ship.getX();
+		y = ship.getY();
 		for (int i = 0;i < ship.getSize();i++)
 		{
 			if (ship.getOrientation() == Orientation.HORIZONTAL)
