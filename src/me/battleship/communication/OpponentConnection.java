@@ -118,6 +118,10 @@ public class OpponentConnection implements MessageListener
 			Log.i(LOG_TAG, "Received diceroll from opponent: " + opponentDiceroll);
 			checkDicerolls();
 		}
+		else
+		{
+			Log.w(LOG_TAG, "Unexpected message:\n" + message.toXML());
+		}
 	}
 
 	/**
