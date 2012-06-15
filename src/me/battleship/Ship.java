@@ -1,5 +1,7 @@
 package me.battleship;
 
+import android.util.Log;
+
 /**
  * A ship
  * 
@@ -7,6 +9,11 @@ package me.battleship;
  */
 public class Ship
 {
+	/**
+	 * The tag for the logger
+	 */
+	public static final String LOG_TAG = "Ship";
+	
 	/**
 	 * The type of the ship
 	 */
@@ -64,28 +71,50 @@ public class Ship
 		this.x = x;
 		this.y = y;
 		this.orientation = orientation;
+		this.size = getSizeForType(type);
 		switch (type)
 		{
 			case AIRCRAFT_CARRIER:
-				size = 5;
 				name = R.string.aircraft_carrier;
 				drawable = (orientation == Orientation.HORIZONTAL ? R.drawable.aircraftcarrier_horizontal : R.drawable.aircraftcarrier_vertical);
 			break;
 			case BATTLESHIP:
-				size = 4;
 				name = R.string.battleship;
 				drawable = (orientation == Orientation.HORIZONTAL ? R.drawable.battleship_horizontal : R.drawable.battleship_vertical);
 			break;
 			case SUBMARINE:
-				size = 3;
 				name = R.string.submarine;
 				drawable = (orientation == Orientation.HORIZONTAL ? R.drawable.submarine_horizontal : R.drawable.submarine_vertical);
 			break;
 			case DESTROYER:
-				size = 2;
 				name = R.string.destoryer;
 				drawable = (orientation == Orientation.HORIZONTAL ? R.drawable.destroyer_horizontal : R.drawable.destroyer_vertical);
 			break;
+		}
+	}
+	
+	/**
+	 * Returns the size for the specified ship type
+	 * 
+	 * @param type
+	 *           the type of the ship
+	 * @return the size
+	 */
+	public static int getSizeForType(ShipType type)
+	{
+		switch (type)
+		{
+			case AIRCRAFT_CARRIER:
+				return 5;
+			case BATTLESHIP:
+				return 4;
+			case SUBMARINE:
+				return 3;
+			case DESTROYER:
+				return 2;
+			default:
+				Log.wtf(LOG_TAG, "Unrecognized value " + type + " in getSizeForType(ShipType)");
+				return -1;
 		}
 	}
 
