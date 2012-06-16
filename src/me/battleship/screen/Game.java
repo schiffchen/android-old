@@ -1,8 +1,11 @@
 package me.battleship.screen;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import me.battleship.Orientation;
 import me.battleship.R;
@@ -15,6 +18,8 @@ import me.battleship.util.ViewUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,6 +48,11 @@ public class Game implements Screen, GameStartListener
 	 * A list containing the ships which have to be placed on the playground
 	 */
 	List<ShipType> shipsToPlace;
+	
+	/**
+	 * The currently visible red views
+	 */
+	Set<View> redViews;
 	
 	/**
 	 * A array storing which ship is placed on the fieldsS
@@ -83,6 +93,7 @@ public class Game implements Screen, GameStartListener
 	public Game(OpponentConnection connection)
 	{
 		this.connection = connection;
+		redViews = new HashSet<View>();
 		shipsToPlace = new LinkedList<ShipType>();
 		shipsToPlace.add(ShipType.AIRCRAFT_CARRIER);
 		shipsToPlace.add(ShipType.BATTLESHIP);
@@ -250,7 +261,26 @@ public class Game implements Screen, GameStartListener
 		Iterator<ShipType> iterator = shipsToPlace.iterator();
 		ShipType type = iterator.next();
 		if (!validateShipPos(x, y, orientation, type))
+		{
+			HashSet<View> views = new HashSet<View>();
+			for (int i = 0;i < Ship.getSizeForType(type);i++)
+			{
+				boolean horizontal = orientation == Orientation.HORIZONTAL;
+				if (horizontal && !isViewOnPlaygroud(x + i, y))
+				{
+					continue;
+				}
+				if (!horizontal && !isViewOnPlaygroud(x, y + i))
+				{
+					continue;
+				}
+				int viewId = getViewId((horizontal ? x + i : x), (horizontal ? y : y + i));
+				views.add(playgroundView.findViewById(viewId));
+			}
+			markFieldsRed(views);
 			return;
+		}
+		markFieldsRed(null);
 		iterator.remove();
 		refreshPreview();
 		ImageView imageView = new ImageView(activity);
@@ -269,6 +299,37 @@ public class Game implements Screen, GameStartListener
 			}
 		}
 		playgroundView.addView(imageView);
+	}
+	
+	/**
+	 * Marks the specified fields red. If already some fields are marked red, they will be removed.
+	 * @param views the views to mark red. If <code>null</code> no views will be marked red.
+	 */
+	private void markFieldsRed(Collection<View> views)
+	{
+		for (View view : redViews)
+		{
+			ViewUtils.removeView(view);
+		}
+		redViews.clear();
+		if (views == null)
+			return;
+		for (View view : views)
+		{
+			int id = view.getId();
+			LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+			layoutParams.addRule(RelativeLayout.ALIGN_LEFT, id);
+			layoutParams.addRule(RelativeLayout.ALIGN_TOP, id);
+			layoutParams.addRule(RelativeLayout.ALIGN_RIGHT, id);
+			layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, id);
+			ColorDrawable color = new ColorDrawable(Color.RED);
+			color.setAlpha(50);
+			ImageView imageView = new ImageView(activity);
+			imageView.setImageDrawable(color);
+			imageView.setLayoutParams(layoutParams);
+			playgroundView.addView(imageView);
+			redViews.add(imageView);
+		}
 	}
 	
 	/**
@@ -302,12 +363,33 @@ public class Game implements Screen, GameStartListener
 	}
 	
 	/**
+	 * Returns whether the specified coordinate is on the field or not
+	 * 
+	 * @param x the x pos
+	 * @param y the y pos
+	 * @return if the specified position is on the playground
+	 */
+	private static boolean isViewOnPlaygroud(int x, int y)
+	{
+		if (x < 0)
+			return false;
+		if (y < 0)
+			return false;
+		if (x >= SIZE)
+			return false;
+		if (y >= SIZE)
+			return false;
+		return true;
+	}
+	
+	/**
 	 * Removes a ship from the playground
 	 * @param x the x position of the ship
 	 * @param y the y position of the ship
 	 */
 	void removeShip(int x, int y)
 	{
+		markFieldsRed(null);
 		Ship ship = fields[x][y];
 		x = ship.getX();
 		y = ship.getY();
