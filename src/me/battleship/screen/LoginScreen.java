@@ -57,6 +57,11 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 	 */
 	private EditText password;
 	
+	/**
+	 * The text field for the port
+	 */
+	private EditText port;
+	
 	@Override
 	public View getView(@SuppressWarnings("hiding") Activity activity)
 	{
@@ -66,6 +71,8 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		jabberid.setText(LoginCredentials.USERNAME);
 		password = (EditText) view.findViewById(R.id.editPassword);
 		password.setText(LoginCredentials.PASSWORD);
+		port = (EditText) view.findViewById(R.id.editPort);
+		port.setText("80");
 		Button loginButton = (Button) view.findViewById(R.id.buttonLogin);
 		loginButton.setOnClickListener(this);
 		Button anonymousLoginButton = (Button) view.findViewById(R.id.buttonAnonymousLogin);
@@ -86,7 +93,7 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		Connection connection;
 		if (v.getId() == R.id.buttonLogin)
 		{
-			connection = new Connection(new JID(jabberid.getText().toString()), 80, password.getText().toString());
+			connection = new Connection(new JID(jabberid.getText().toString()), Integer.parseInt(port.getText().toString()), password.getText().toString());
 		}
 		else
 		{
