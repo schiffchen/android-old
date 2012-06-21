@@ -18,7 +18,9 @@
     <string name="searching_for_opponent">Searching for opponent…</string>
     <string name="waiting_for_opponent">Waiting for opponent…</string>
     
-    <string name="ready">Ready</string>
+    <string name="ready">Ready</string> 
+    <string name="yourturn">You have the first turn</string>
+    <string name="enemysturn">Your opponent has the first turn</string>
     
     <string name="aircraft_carrier">Aircraft carrier</string>
     <string name="battleship">Battleship</string>

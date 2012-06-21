@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * This is where the match takes place
@@ -83,6 +84,16 @@ public class Game implements Screen, GameStartListener
 	 * A dialog displayed while waiting for the enemy
 	 */
 	private AlertDialog waitingDialog;
+	
+	/**
+	 * Indicates whether the game has already started
+	 */
+	private boolean gameStarted;
+	
+	/**
+	 * Indicates whether its your turn or not
+	 */
+	private boolean yourturn;
 
 	/**
 	 * Instantiates a new Game
@@ -93,6 +104,7 @@ public class Game implements Screen, GameStartListener
 	public Game(OpponentConnection connection)
 	{
 		this.connection = connection;
+		gameStarted = false;
 		redViews = new HashSet<View>();
 		shipsToPlace = new LinkedList<ShipType>();
 		shipsToPlace.add(ShipType.AIRCRAFT_CARRIER);
@@ -434,11 +446,14 @@ public class Game implements Screen, GameStartListener
 	}
 
 	@Override
-	public void onGameStart(boolean yourturn)
+	public void onGameStart(@SuppressWarnings("hiding") boolean yourturn)
 	{
 		waitingDialog.dismiss();
 		waitingDialog = null;
-		System.out.println("Game started. " + yourturn);
+		gameStarted = true;
+		this.yourturn = yourturn;
+		Toast toast = Toast.makeText(activity, (yourturn ? R.string.yourturn : R.string.enemysturn), Toast.LENGTH_SHORT);
+		toast.show();
 	}
 
 	/**
