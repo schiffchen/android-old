@@ -126,6 +126,32 @@ public class Ship
 				return -1;
 		}
 	}
+	
+	/**
+	 * Returns the ship type for the specified size
+	 * 
+	 * @param size
+	 *           the size
+	 * @return the ship type
+	 * @throws IllegalArgumentException
+	 *            if there is no ship type with the specified size
+	 */
+	public static ShipType getTypeForSize(int size) throws IllegalArgumentException
+	{
+		switch (size)
+		{
+			case 5:
+				return ShipType.AIRCRAFT_CARRIER;
+			case 4:
+				return ShipType.BATTLESHIP;
+			case 3:
+				return ShipType.SUBMARINE;
+			case 2:
+				return ShipType.DESTROYER;
+			default:
+				throw new IllegalArgumentException("unrecognized value " + size + " in getTypeForSize(int)");
+		}
+	}
 
 	/**
 	 * Returns the type of the ship

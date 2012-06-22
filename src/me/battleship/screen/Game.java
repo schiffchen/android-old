@@ -12,7 +12,8 @@ import me.battleship.R;
 import me.battleship.Ship;
 import me.battleship.ShipType;
 import me.battleship.communication.OpponentConnection;
-import me.battleship.communication.OpponentConnection.GameStartListener;
+import me.battleship.communication.OpponentConnection.OpponentConnectionListener;
+import me.battleship.communication.Result;
 import me.battleship.util.ViewFactory;
 import me.battleship.util.ViewUtils;
 import android.app.Activity;
@@ -38,7 +39,7 @@ import android.widget.Toast;
  * 
  * @author Manuel Vögele
  */
-public class Game implements Screen, GameStartListener
+public class Game implements Screen, OpponentConnectionListener
 {
 	/**
 	 * The x and y size of the playground
@@ -104,6 +105,7 @@ public class Game implements Screen, GameStartListener
 	public Game(OpponentConnection connection)
 	{
 		this.connection = connection;
+		connection.setListener(this);
 		gameStarted = false;
 		redViews = new HashSet<View>();
 		shipsToPlace = new LinkedList<ShipType>();
@@ -442,7 +444,7 @@ public class Game implements Screen, GameStartListener
 		text.setText(R.string.waiting_for_opponent);
 		builder.setView(view);
 		waitingDialog = builder.show();
-		connection.sendDiceroll(this);
+		connection.sendDiceroll();
 	}
 
 	@Override
@@ -454,6 +456,20 @@ public class Game implements Screen, GameStartListener
 		this.yourturn = yourturn;
 		Toast toast = Toast.makeText(activity, (yourturn ? R.string.yourturn : R.string.enemysturn), Toast.LENGTH_SHORT);
 		toast.show();
+	}
+
+	@Override
+	public void onShotResult(int x, int y, Result result, Ship ship)
+	{
+		// TODO Auto-generated method stub
+		System.out.println("Received shot - x:"+ x + " y:" + y + " result:" + result + "ship:" + ship);
+	}
+
+	@Override
+	public void onOpponentShot(int x, int y)
+	{
+		// TODO Auto-generated method stub
+		System.out.println("Received shot - x:"+ x + " y:" + y);
 	}
 
 	/**

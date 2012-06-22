@@ -12,7 +12,10 @@ public enum ExtensionElements
 {
 	BATTLESHIP("battleship"),
 	QUEUEING("queueing"),
-	DICEROLL("diceroll");
+	DICEROLL("diceroll"),
+	SHOOT("shoot"),
+	SHIP("ship"),
+	PING("ping");
 	
 	/**
 	 * The name of the element as used in xml files

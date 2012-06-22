@@ -2,11 +2,17 @@ package me.battleship.communication;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import me.battleship.Orientation;
+import me.battleship.Ship;
+import me.battleship.ShipType;
 import me.battleship.communication.messages.BattleshipPacketExtension;
 import me.battleship.communication.messages.DicerollMessage;
 import me.battleship.communication.messages.ExtensionElements;
 import me.battleship.communication.messages.MessageUtil;
+import me.battleship.communication.messages.PingMessage;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
@@ -20,12 +26,17 @@ import android.util.Log;
  *
  * @author Manuel Vögele
  */
-public class OpponentConnection implements MessageListener
+public class OpponentConnection extends TimerTask implements MessageListener
 {
 	/**
 	 * The tag for the logger
 	 */
 	public static final String LOG_TAG = "OpponentConnection";
+	
+	/**
+	 * The time between two pings
+	 */
+	public static final int PINGDELAY = 10000;
 
 	/**
 	 * The own diceroll
@@ -50,7 +61,12 @@ public class OpponentConnection implements MessageListener
 	/**
 	 * The listener called when the game starts
 	 */
-	private GameStartListener listener;
+	private OpponentConnectionListener listener;
+
+	/**
+	 * The timer
+	 */
+	private Timer timer;
 
 	/**
 	 * Establishes a new connection
@@ -63,15 +79,40 @@ public class OpponentConnection implements MessageListener
 		random = new Random();
 		Log.i(LOG_TAG, "Establishing connection to " + opponentJID);
 		chat = Connection.INSTANCE.connection.getChatManager().createChat(opponentJID, this);
+		timer = new Timer();
+		timer.scheduleAtFixedRate(this, 0, PINGDELAY);
+		// TODO Check ping from opponent
+	}
+	
+	/**
+	 * Set the OpponentConnectionListener
+	 * @param listener the opponent connection listener
+	 */
+	public void setListener(OpponentConnectionListener listener)
+	{
+		this.listener = listener;
+	}
+	
+	@Override
+	public void run()
+	{
+		try
+		{
+			chat.sendMessage(new PingMessage());
+		}
+		catch (XMPPException e)
+		{
+			cancel();
+			timer.scheduleAtFixedRate(this, 1000, PINGDELAY);
+			Log.w(LOG_TAG, "Error while sending ping. Retry in 1 second.", e);
+		}
 	}
 
 	/**
 	 * Sends a diceroll to the opponent
-	 * @param listener the listener that will be called when the game starts
 	 */
-	public void sendDiceroll(@SuppressWarnings("hiding") GameStartListener listener)
+	public void sendDiceroll()
 	{
-		this.listener = listener;
 		diceroll = random.nextInt(5) + 1;
 		Log.i(LOG_TAG, "Sending diceroll: " + diceroll);
 		try
@@ -98,11 +139,10 @@ public class OpponentConnection implements MessageListener
 				Log.i(LOG_TAG, "Rerolling...");
 				opponentDiceroll = 0;
 				diceroll = 0;
-				sendDiceroll(listener);
+				sendDiceroll();
 				return;
 			}
 			listener.onGameStart(diceroll > opponentDiceroll);
-			listener = null;
 		}
 	}
 
@@ -111,12 +151,48 @@ public class OpponentConnection implements MessageListener
 	{
 		BattleshipPacketExtension extension = MessageUtil.getPacketExtension(message, ExtensionElements.BATTLESHIP);
 		BattleshipPacketExtension dicerollExtension = extension.getSubElement(ExtensionElements.DICEROLL);
+		BattleshipPacketExtension shoot = extension.getSubElement(ExtensionElements.SHOOT);
 		if (dicerollExtension != null)
 		{
 			Map<String, String> attributes = dicerollExtension.getAttributes();
 			opponentDiceroll = Integer.parseInt(attributes.get("dice"));
 			Log.i(LOG_TAG, "Received diceroll from opponent: " + opponentDiceroll);
 			checkDicerolls();
+		}
+		else if (shoot != null)
+		{
+			Map<String, String> attributes = shoot.getAttributes();
+			int x = Integer.parseInt(attributes.get("x"));
+			int y = Integer.parseInt(attributes.get("y"));
+			if (attributes.containsKey("result"))
+			{
+				Result result = Result.getResultForString(attributes.get("result"));
+				BattleshipPacketExtension shipExtension = extension.getSubElement(ExtensionElements.SHIP);
+				Ship ship = null;
+				if (shipExtension != null)
+				{
+					attributes = shipExtension.getAttributes();
+					ShipType type = Ship.getTypeForSize(Integer.parseInt(attributes.get("size")));
+					int sx = Integer.parseInt(attributes.get("x"));
+					int sy = Integer.parseInt(attributes.get("y"));
+					String sOrientation = attributes.get("attributes");
+					Orientation orientation;
+					if ("horizontal".equals(sOrientation))
+					{
+						orientation = Orientation.HORIZONTAL;
+					}
+					else
+					{
+						orientation = Orientation.VERTICAL;
+					}
+					ship = new Ship(type, sx, sy, orientation, null);
+				}
+				listener.onShotResult(x, y, result, ship);
+			}
+			else
+			{
+				listener.onOpponentShot(x, y);
+			}
 		}
 		else
 		{
@@ -129,7 +205,7 @@ public class OpponentConnection implements MessageListener
 	 *
 	 * @author Manuel Vögele
 	 */
-	public interface GameStartListener
+	public interface OpponentConnectionListener
 	{
 		/**
 		 * Indicates that both players have placed their ships and the game can start.
@@ -137,5 +213,23 @@ public class OpponentConnection implements MessageListener
 		 * @param yourturn whether you have the first turn
 		 */
 		public void onGameStart(boolean yourturn);
+		
+		/**
+		 * This event will be fired when the enemy sent the result of your last shot
+		 * 
+		 * @param x the x position of the shot
+		 * @param y the y position of the shot
+		 * @param result the result
+		 * @param ship the ship if it was sunken, <code>null</code> otherwise
+		 */
+		public void onShotResult(int x, int y, Result result, Ship ship);
+		
+		/**
+		 * This event will be fired when the opponent shot
+		 * 
+		 * @param x the x position
+		 * @param y the y position
+		 */
+		public void onOpponentShot(int x, int y);
 	}
 }
