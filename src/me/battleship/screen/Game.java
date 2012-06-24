@@ -59,9 +59,14 @@ public class Game implements Screen, OpponentConnectionListener
 	Set<View> redViews;
 	
 	/**
-	 * A array storing which ship is placed on the fieldsS
+	 * An array storing the fields of the player
 	 */
 	PlaygroundField[][] fields = new PlaygroundField[SIZE][SIZE];
+	
+	/**
+	 * An array storing the fields of the opponent
+	 */
+	PlaygroundField[][] opponentFields = new PlaygroundField[SIZE][SIZE];
 
 	/**
 	 * The root view
@@ -129,6 +134,7 @@ public class Game implements Screen, OpponentConnectionListener
 			for (int x = 0;x < SIZE;x++)
 			{
 				fields[x][y] = new PlaygroundField();
+				opponentFields[x][y] = new PlaygroundField();
 			}
 		}
 		makeGrid();
@@ -176,16 +182,19 @@ public class Game implements Screen, OpponentConnectionListener
 	}
 	
 	/**
-	 * Draws the playground of the player
+	 * Draws the playground
+	 * 
+	 * @param viewFields
+	 *           the fields which should be drawn
 	 */
-	void drawPlayerView()
+	void drawView(PlaygroundField viewFields[][])
 	{
 		makeGrid();
 		for (int y = 0;y < SIZE;y++)
 		{
 			for (int x = 0;x < SIZE;x++)
 			{
-				PlaygroundField field = fields[x][y];
+				PlaygroundField field = viewFields[x][y];
 				Ship ship = field.getShip();
 				if (ship != null && ship.getX() == x && ship.getY() == y)
 				{
@@ -571,8 +580,40 @@ public class Game implements Screen, OpponentConnectionListener
 	@Override
 	public void onShotResult(int x, int y, Result result, Ship ship)
 	{
-		// TODO Auto-generated method stub
-		System.out.println("Received shot result - x:"+ x + " y:" + y + " result:" + result + " ship:" + ship);
+		PlaygroundField field = opponentFields[x][y];
+		field.setHit(true);
+		field.setIsShip(result == Result.SHIP);
+		if (ship != null)
+		{
+			ImageView imageView = new ImageView(activity);
+			imageView.setImageResource(ship.getDrawable());
+			ship.setView(imageView);
+			for (int i = 0;i < ship.getSize();i++)
+			{
+				int iX, iY;
+				if (ship.getOrientation() == Orientation.HORIZONTAL)
+				{
+					iX = ship.getX() + i;
+					iY = ship.getY();
+				}
+				else
+				{
+					iX = ship.getX();
+					iY = ship.getY() + i;
+				}
+				opponentFields[iX][iY].setShip(ship);
+			}
+		}
+		activity.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				drawView(opponentFields);
+				
+			}
+		});
+		// TODO Switch to other field
 	}
 
 	@Override
@@ -600,9 +641,10 @@ public class Game implements Screen, OpponentConnectionListener
 			@Override
 			public void run()
 			{
-				drawPlayerView();
+				drawView(fields);
 			}
 		});
+		// TODO Switch to other view
 	}
 	
 	@Override
