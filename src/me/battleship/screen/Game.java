@@ -471,6 +471,13 @@ public class Game implements Screen, OpponentConnectionListener
 		// TODO Auto-generated method stub
 		System.out.println("Received shot - x:"+ x + " y:" + y);
 	}
+	
+	@Override
+	public void onOpponentDisconnected()
+	{
+		// TODO Auto-generated method stub
+		System.out.println("Opponent disconnected.");
+	}
 
 	/**
 	 * A listener called when a field is clicked

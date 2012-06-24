@@ -1,5 +1,6 @@
 package me.battleship.communication;
 
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
@@ -67,6 +68,11 @@ public class OpponentConnection extends TimerTask implements MessageListener
 	 * The timer
 	 */
 	private Timer timer;
+	
+	/**
+	 * The timestamp when the last ping from the opponent was received
+	 */
+	private long lastping;
 
 	/**
 	 * Establishes a new connection
@@ -81,7 +87,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		chat = Connection.INSTANCE.connection.getChatManager().createChat(opponentJID, this);
 		timer = new Timer();
 		timer.scheduleAtFixedRate(this, 0, PINGDELAY);
-		// TODO Check ping from opponent
+		lastping = Calendar.getInstance().getTimeInMillis();
 	}
 	
 	/**
@@ -105,6 +111,12 @@ public class OpponentConnection extends TimerTask implements MessageListener
 			cancel();
 			timer.scheduleAtFixedRate(this, 1000, PINGDELAY);
 			Log.w(LOG_TAG, "Error while sending ping. Retry in 1 second.", e);
+		}
+		long now = Calendar.getInstance().getTimeInMillis();
+		if (now - lastping > PINGDELAY * 1)
+		{
+			cancel();
+			listener.onOpponentDisconnected();
 		}
 	}
 
@@ -231,5 +243,10 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		 * @param y the y position
 		 */
 		public void onOpponentShot(int x, int y);
+		
+		/**
+		 * This event will be fired when the opponent disconnected
+		 */
+		public void onOpponentDisconnected();
 	}
 }
