@@ -28,6 +28,7 @@ public class ShootMessage extends BattleshipMessage
 		shoot.setAttribute("x", String.valueOf(x));
 		shoot.setAttribute("y", String.valueOf(y));
 		root.addSubElement(shoot);
+		addExtension(root);
 	}
 	
 	/**

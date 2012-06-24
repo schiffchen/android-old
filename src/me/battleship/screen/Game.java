@@ -481,7 +481,7 @@ public class Game implements Screen, OpponentConnectionListener
 	public void onShotResult(int x, int y, Result result, Ship ship)
 	{
 		// TODO Auto-generated method stub
-		System.out.println("Received shot - x:"+ x + " y:" + y + " result:" + result + "ship:" + ship);
+		System.out.println("Received shot result - x:"+ x + " y:" + y + " result:" + result + " ship:" + ship);
 	}
 
 	@Override
@@ -546,6 +546,7 @@ public class Game implements Screen, OpponentConnectionListener
 			if (gameStarted)
 			{
 				shoot(x, y);
+				return false;
 			}
 			if (fields[x][y] != null)
 			{
