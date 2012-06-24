@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import me.battleship.Orientation;
+import me.battleship.PlaygroundField;
 import me.battleship.R;
 import me.battleship.Ship;
 import me.battleship.ShipType;
@@ -19,6 +20,7 @@ import me.battleship.util.ViewUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.MotionEvent;
@@ -59,7 +61,7 @@ public class Game implements Screen, OpponentConnectionListener
 	/**
 	 * A array storing which ship is placed on the fieldsS
 	 */
-	Ship[][] fields = new Ship[SIZE][SIZE];
+	PlaygroundField[][] fields = new PlaygroundField[SIZE][SIZE];
 
 	/**
 	 * The root view
@@ -122,6 +124,24 @@ public class Game implements Screen, OpponentConnectionListener
 		this.activity = activity;
 		root = ViewFactory.createView(R.layout.game, activity);
 		playgroundView = (RelativeLayout) root.findViewById(R.id.playgroundGrid);
+		for (int y = 0;y < SIZE;y++)
+		{
+			for (int x = 0;x < SIZE;x++)
+			{
+				fields[x][y] = new PlaygroundField();
+			}
+		}
+		makeGrid();
+		refreshPreview();
+		return root;
+	}
+
+	/**
+	 * Draws an empty playground grid
+	 */
+	private void makeGrid()
+	{
+		playgroundView.removeAllViews();
 		FieldTouchListener fieldTouchListener = new FieldTouchListener();
 		for (int y = 0;y < SIZE;y++)
 		{
@@ -153,10 +173,52 @@ public class Game implements Screen, OpponentConnectionListener
 				playgroundView.addView(cell);
 			}
 		}
-		refreshPreview();
-		return root;
 	}
-
+	
+	/**
+	 * Draws the playground of the player
+	 */
+	void drawPlayerView()
+	{
+		makeGrid();
+		for (int y = 0;y < SIZE;y++)
+		{
+			for (int x = 0;x < SIZE;x++)
+			{
+				PlaygroundField field = fields[x][y];
+				Ship ship = field.getShip();
+				if (ship != null && ship.getX() == x && ship.getY() == y)
+				{
+					View view = ship.getView();
+					view.setLayoutParams(getLayoutParamsForShip(ship));
+					playgroundView.addView(view);
+				}
+				if (field.isHit())
+				{
+					ImageView colorfield = makeColorForField(field);
+					colorfield.setLayoutParams(getLayoutParamsForPos(x, y));
+					playgroundView.addView(colorfield);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Makes a colored view for the specified playground field
+	 * 
+	 * @param field
+	 *           the field
+	 * @return the colored view
+	 */
+	private ImageView makeColorForField(PlaygroundField field)
+	{
+		ImageView colorfield = new ImageView(activity);
+		ColorDrawable colorDrawable = new ColorDrawable(field.isShip() ? Color.RED : Color.WHITE);
+		colorDrawable.setAlpha(50);
+		colorfield.setImageDrawable(colorDrawable);
+		return colorfield;
+	}
+	
 	/**
 	 * Returns the id of the view at the specified position
 	 * 
@@ -259,6 +321,26 @@ public class Game implements Screen, OpponentConnectionListener
 		layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, getViewId(endX, endY));
 		return layoutParams;
 	}
+	
+	/**
+	 * Returns the layout params for the specified position
+	 * 
+	 * @param x
+	 *           the x position
+	 * @param y
+	 *           the y position
+	 * @return the layout params for the specified position
+	 */
+	private static RelativeLayout.LayoutParams getLayoutParamsForPos(int x, int y)
+	{
+		LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		int id = getViewId(x, y);
+		layoutParams.addRule(RelativeLayout.ALIGN_LEFT, id);
+		layoutParams.addRule(RelativeLayout.ALIGN_TOP, id);
+		layoutParams.addRule(RelativeLayout.ALIGN_RIGHT, id);
+		layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, id);
+		return layoutParams;
+	}
 
 	/**
 	 * Place a ship at the specified position
@@ -305,11 +387,11 @@ public class Game implements Screen, OpponentConnectionListener
 		{
 			if (orientation == Orientation.HORIZONTAL) 
 			{
-				fields[x + i][y] = ship;
+				fields[x + i][y].setShip(ship);
 			}
 			else
 			{
-				fields[x][y + i] = ship;
+				fields[x][y + i].setShip(ship);
 			}
 		}
 		playgroundView.addView(imageView);
@@ -368,9 +450,9 @@ public class Game implements Screen, OpponentConnectionListener
 			return false;
 		for (int i = 0;i < size;i++)
 		{
-			if (orientation == Orientation.HORIZONTAL && fields[x + i][y] != null)
+			if (orientation == Orientation.HORIZONTAL && fields[x + i][y].getShip() != null)
 				return false;
-			if (orientation == Orientation.VERTICAL && fields[x][y + i] != null)
+			if (orientation == Orientation.VERTICAL && fields[x][y + i].getShip() != null)
 				return false;
 		}
 		return true;
@@ -404,18 +486,18 @@ public class Game implements Screen, OpponentConnectionListener
 	void removeShip(int x, int y)
 	{
 		markFieldsRed(null);
-		Ship ship = fields[x][y];
+		Ship ship = fields[x][y].getShip();
 		x = ship.getX();
 		y = ship.getY();
 		for (int i = 0;i < ship.getSize();i++)
 		{
 			if (ship.getOrientation() == Orientation.HORIZONTAL)
 			{
-				fields[x + i][y] = null;
+				fields[x + i][y].setShip(null);
 			}
 			else
 			{
-				fields[x][y + i] = null;
+				fields[x][y + i].setShip(null);
 			}
 		}
 		ShipType type = ship.getType();
@@ -473,8 +555,17 @@ public class Game implements Screen, OpponentConnectionListener
 		waitingDialog = null;
 		gameStarted = true;
 		this.yourturn = yourturn;
-		Toast toast = Toast.makeText(activity, (yourturn ? R.string.yourturn : R.string.enemysturn), Toast.LENGTH_SHORT);
-		toast.show();
+		final int toastText = yourturn ? R.string.yourturn : R.string.enemysturn;
+		final Context context = activity;
+		activity.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Toast toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		});
 	}
 
 	@Override
@@ -487,22 +578,31 @@ public class Game implements Screen, OpponentConnectionListener
 	@Override
 	public void onOpponentShot(int x, int y)
 	{
-		// TODO Remove sysout
-		System.out.println("Received shot - x:"+ x + " y:" + y);
-		// TODO Display result
 		yourturn = true;
-		Ship ship = fields[x][y];
+		PlaygroundField field = fields[x][y];
+		field.setHit(true);
+		Ship ship = field.getShip();
 		if (ship == null)
 		{
 			connection.sendResult(x, y, Result.WATER, null);
-			return;
 		}
-		ship.destroyField(x, y);
-		if (!ship.areAllFieldsDestroyed())
+		else
 		{
-			ship = null;
+			ship.destroyField(x, y);
+			if (!ship.areAllFieldsDestroyed())
+			{
+				ship = null;
+			}
+			connection.sendResult(x, y, Result.SHIP, ship);
 		}
-		connection.sendResult(x, y, Result.SHIP, ship);
+		activity.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				drawPlayerView();
+			}
+		});
 	}
 	
 	@Override
@@ -548,7 +648,7 @@ public class Game implements Screen, OpponentConnectionListener
 				shoot(x, y);
 				return false;
 			}
-			if (fields[x][y] != null)
+			if (fields[x][y].getShip() != null)
 			{
 				removeShip(x, y);
 				return false;
