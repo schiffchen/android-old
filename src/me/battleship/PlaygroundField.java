@@ -74,6 +74,7 @@ public class PlaygroundField
 	 */
 	public void setShip(Ship ship)
 	{
+		isShip = ship != null;
 		this.ship = ship;
 	}
 	
