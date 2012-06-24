@@ -51,6 +51,11 @@ public class Ship
 	private Orientation orientation;
 	
 	/**
+	 * An array containing the field that was destroyed 
+	 */
+	private boolean fieldDestroyed[];
+	
+	/**
 	 * The view displaying this ship
 	 */
 	private View view;
@@ -99,6 +104,11 @@ public class Ship
 				name = R.string.destoryer;
 				drawable = (orientation == Orientation.HORIZONTAL ? R.drawable.destroyer_horizontal : R.drawable.destroyer_vertical);
 			break;
+		}
+		fieldDestroyed = new boolean[size];
+		for (int i = 0;i < size;i++)
+		{
+			fieldDestroyed[i] = false;
 		}
 	}
 	
@@ -230,5 +240,56 @@ public class Ship
 	public View getView()
 	{
 		return view;
+	}
+	
+	/**
+	 * Destroys the field at the specified position
+	 * 
+	 * @param xpos
+	 *           the x position
+	 * @param ypos
+	 *           the y position
+	 * @throws IllegalArgumentException
+	 *            if the field is not a field of the ship
+	 */
+	public void destroyField(int xpos, int ypos) throws IllegalArgumentException
+	{
+		for (int i = 0;i < size;i++)
+		{
+			int iX, iY;
+			if (orientation == Orientation.HORIZONTAL)
+			{
+				iX = x + i;
+				iY = y;
+			}
+			else
+			{
+				iX = x;
+				iY = y + i;
+			}
+			if (iX == xpos && iY == ypos)
+			{
+				fieldDestroyed[i] = true;
+				return;
+			}
+		}
+		throw new IllegalArgumentException("Position " + xpos + "," + ypos + " is not a position of this ship (" + x + "," + y + "," + orientation + ")");
+	}
+	
+	/**
+	 * Returns if all fields of this ship are destroyed
+	 * 
+	 * @return if all fields of this ship are destroyed
+	 */
+	public boolean areAllFieldsDestroyed()
+	{
+		for (boolean destroyed : fieldDestroyed)
+		{
+			if (destroyed == false)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }
