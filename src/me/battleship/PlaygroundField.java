@@ -15,7 +15,12 @@ public class PlaygroundField
 	/**
 	 * Indicates whether a ship is on this field
 	 */
-	private boolean ship;
+	private boolean isShip;
+	
+	/**
+	 * The ship placed on this field
+	 */
+	private Ship ship;
 	
 	/**
 	 * Constructs a new playground field. All values are <code>false</code> per default.
@@ -23,7 +28,8 @@ public class PlaygroundField
 	public PlaygroundField()
 	{
 		hit = false;
-		ship = false;
+		isShip = false;
+		ship = null;
 	}
 
 	/**
@@ -48,9 +54,9 @@ public class PlaygroundField
 	 * Set if a ship is on this field
 	 * @param ship <code>true</code> if a ship is on this field
 	 */
-	public void setShip(boolean ship)
+	public void setIsShip(boolean ship)
 	{
-		this.ship = ship;
+		this.isShip = ship;
 	}
 	
 	/**
@@ -58,6 +64,24 @@ public class PlaygroundField
 	 * @return <code>true</code> if a ship is on this field
 	 */
 	public boolean isShip()
+	{
+		return isShip;
+	}
+	
+	/**
+	 * Sets a ship on this field
+	 * @param ship the ship
+	 */
+	public void setShip(Ship ship)
+	{
+		this.ship = ship;
+	}
+	
+	/**
+	 * Returns the ship placed on this field
+	 * @return the ship placed on this field
+	 */
+	public Ship getShip()
 	{
 		return ship;
 	}
