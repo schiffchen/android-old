@@ -89,7 +89,7 @@ public class Game implements Screen, OpponentConnectionListener
 	/**
 	 * Indicates whether the game has already started
 	 */
-	private boolean gameStarted;
+	boolean gameStarted;
 	
 	/**
 	 * Indicates whether its your turn or not
@@ -433,6 +433,25 @@ public class Game implements Screen, OpponentConnectionListener
 	}
 	
 	/**
+	 * Shoot at an enemy ship
+	 * 
+	 * @param x
+	 *           the x position
+	 * @param y
+	 *           the y position
+	 */
+	void shoot(int x, int y)
+	{
+		if (!yourturn)
+		{
+			return;
+		}
+		connection.sendShot(x, y);
+		yourturn = false;
+		// TODO Switch to other view
+	}
+	
+	/**
 	 * Sends a diceroll to the enemy
 	 */
 	void sendDiceroll()
@@ -468,8 +487,22 @@ public class Game implements Screen, OpponentConnectionListener
 	@Override
 	public void onOpponentShot(int x, int y)
 	{
-		// TODO Auto-generated method stub
+		// TODO Remove sysout
 		System.out.println("Received shot - x:"+ x + " y:" + y);
+		// TODO Display result
+		yourturn = true;
+		Ship ship = fields[x][y];
+		if (ship == null)
+		{
+			connection.sendResult(x, y, Result.WATER, null);
+			return;
+		}
+		ship.destroyField(x, y);
+		if (!ship.areAllFieldsDestroyed())
+		{
+			ship = null;
+		}
+		connection.sendResult(x, y, Result.SHIP, ship);
 	}
 	
 	@Override
@@ -510,6 +543,10 @@ public class Game implements Screen, OpponentConnectionListener
 		{
 			int x = getXFromId(view.getId());
 			int y = getYFromId(view.getId());
+			if (gameStarted)
+			{
+				shoot(x, y);
+			}
 			if (fields[x][y] != null)
 			{
 				removeShip(x, y);

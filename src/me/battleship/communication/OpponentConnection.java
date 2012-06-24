@@ -157,6 +157,50 @@ public class OpponentConnection extends TimerTask implements MessageListener
 			listener.onGameStart(diceroll > opponentDiceroll);
 		}
 	}
+	
+	/**
+	 * Sends a shoot to the opponent
+	 * 
+	 * @param x
+	 *           the x position
+	 * @param y
+	 *           the y position
+	 */
+	public void sendShot(int x, int y)
+	{
+		try
+		{
+			chat.sendMessage(new ShootMessage(x, y));
+		}
+		catch (XMPPException e)
+		{
+			Log.e(LOG_TAG, "An error occured while sending a shot to the opponenet.", e);
+		}
+	}
+	
+	/**
+	 * Sends a shot result to the opponent
+	 * 
+	 * @param x
+	 *           the x position
+	 * @param y
+	 *           the y position
+	 * @param result
+	 *           the result
+	 * @param ship
+	 *           the ship that was sunk or <code>null</code> if no ship was sunk
+	 */
+	public void sendResult(int x, int y, Result result, Ship ship)
+	{
+		try
+		{
+			chat.sendMessage(new ShootMessage(x, y, result, ship));
+		}
+		catch (XMPPException e)
+		{
+			Log.e(LOG_TAG, "An error occured while sending a shot to the opponent.", e);
+		}
+	}
 
 	@Override
 	public void processMessage(@SuppressWarnings("hiding") Chat chat, Message message)
