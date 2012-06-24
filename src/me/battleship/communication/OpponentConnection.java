@@ -113,7 +113,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 			Log.w(LOG_TAG, "Error while sending ping. Retry in 1 second.", e);
 		}
 		long now = Calendar.getInstance().getTimeInMillis();
-		if (now - lastping > PINGDELAY * 1)
+		if (now - lastping > PINGDELAY * 2)
 		{
 			cancel();
 			listener.onOpponentDisconnected();
@@ -164,6 +164,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		BattleshipPacketExtension extension = MessageUtil.getPacketExtension(message, ExtensionElements.BATTLESHIP);
 		BattleshipPacketExtension dicerollExtension = extension.getSubElement(ExtensionElements.DICEROLL);
 		BattleshipPacketExtension shoot = extension.getSubElement(ExtensionElements.SHOOT);
+		BattleshipPacketExtension ping = extension.getSubElement(ExtensionElements.PING);
 		if (dicerollExtension != null)
 		{
 			Map<String, String> attributes = dicerollExtension.getAttributes();
@@ -206,10 +207,15 @@ public class OpponentConnection extends TimerTask implements MessageListener
 				listener.onOpponentShot(x, y);
 			}
 		}
+		else if (ping != null)
+		{
+			Log.i(LOG_TAG, "Received ping from opponent");
+		}
 		else
 		{
 			Log.w(LOG_TAG, "Unexpected message:\n" + message.toXML());
 		}
+		lastping = Calendar.getInstance().getTimeInMillis();
 	}
 
 	/**
