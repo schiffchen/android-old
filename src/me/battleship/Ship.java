@@ -292,4 +292,14 @@ public class Ship
 		}
 		return true;
 	}
+	
+	/**
+	 * Sets the view of the ship
+	 * 
+	 * @param view the view of the ship
+	 */
+	public void setView(View view)
+	{
+		this.view = view;
+	}
 }
