@@ -232,7 +232,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 					ShipType type = Ship.getTypeForSize(Integer.parseInt(attributes.get("size")));
 					int sx = Integer.parseInt(attributes.get("x"));
 					int sy = Integer.parseInt(attributes.get("y"));
-					String sOrientation = attributes.get("attributes");
+					String sOrientation = attributes.get("orientation");
 					Orientation orientation;
 					if ("horizontal".equals(sOrientation))
 					{
