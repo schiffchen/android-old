@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import me.battleship.Orientation;
 import me.battleship.PlaygroundField;
@@ -564,6 +566,17 @@ public class Game implements Screen, OpponentConnectionListener
 		waitingDialog = null;
 		gameStarted = true;
 		this.yourturn = yourturn;
+		if (yourturn)
+		{
+			activity.runOnUiThread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					drawView(opponentFields);
+				}
+			});
+		}
 		final int toastText = yourturn ? R.string.yourturn : R.string.enemysturn;
 		final Context context = activity;
 		activity.runOnUiThread(new Runnable()
@@ -610,10 +623,24 @@ public class Game implements Screen, OpponentConnectionListener
 			public void run()
 			{
 				drawView(opponentFields);
-				
 			}
 		});
-		// TODO Switch to other field
+		final Activity paramActivity = activity;
+		new Timer().schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				paramActivity.runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						drawView(fields);
+					}
+				});
+			}
+		}, 1000);
 	}
 
 	@Override
@@ -644,7 +671,22 @@ public class Game implements Screen, OpponentConnectionListener
 				drawView(fields);
 			}
 		});
-		// TODO Switch to other view
+		final Activity paramActivity = activity;
+		new Timer().schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				paramActivity.runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						drawView(opponentFields);
+					}
+				});
+			}
+		}, 1000);
 	}
 	
 	@Override
