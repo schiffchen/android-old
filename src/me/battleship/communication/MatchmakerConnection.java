@@ -8,6 +8,7 @@ import me.battleship.communication.messages.BattleshipPacketExtension;
 import me.battleship.communication.messages.ExtensionElements;
 import me.battleship.communication.messages.MessageUtil;
 import me.battleship.communication.messages.QueueMessage;
+import me.battleship.communication.messages.ResultMessage;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
@@ -42,6 +43,11 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	 * The queueid
 	 */
 	private String queueId;
+	
+	/**
+	 * The match id
+	 */
+	private String matchId;
 	
 	/**
 	 * A timer
@@ -84,6 +90,23 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 		catch (XMPPException e)
 		{
 			Log.e(LOG_TAG, "An error occured while queuing.", e);
+		}
+	}
+	
+	/**
+	 * Sends the result of a match to the matchmaker
+	 * 
+	 * @param winnerJID the JID of the winner
+	 */
+	public void sendResult(String winnerJID)
+	{
+		try
+		{
+			chat.sendMessage(new ResultMessage(matchId, winnerJID));
+		}
+		catch (XMPPException e)
+		{
+			Log.w(LOG_TAG, "An error occured while sending the results to the matchmaker.", e);
 		}
 	}
 	

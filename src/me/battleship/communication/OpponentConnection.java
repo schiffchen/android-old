@@ -81,12 +81,19 @@ public class OpponentConnection extends TimerTask implements MessageListener
 	private final String opponentJID;
 
 	/**
+	 * The connection to the matchmaker
+	 */
+	private final MatchmakerConnection matchmakerConnection;
+
+	/**
 	 * Establishes a new connection
 	 * @param opponentJID the jabber id of the opponent
+	 * @param matchmakerConnection the connection to the matchmaker or <code>null</code> if the game was connected directly
 	 */
-	public OpponentConnection(String opponentJID)
+	public OpponentConnection(String opponentJID, MatchmakerConnection matchmakerConnection)
 	{
 		this.opponentJID = opponentJID;
+		this.matchmakerConnection = matchmakerConnection;
 		diceroll = 0;
 		opponentDiceroll = 0;
 		random = new Random();
@@ -232,6 +239,10 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		catch (XMPPException e)
 		{
 			Log.e(LOG_TAG, "An error occured while sending a gamestat message to the opponent", e);
+		}
+		if (matchmakerConnection != null)
+		{
+			matchmakerConnection.sendResult((youwon ? Connection.INSTANCE.jid.getId() : opponentJID));
 		}
 	}
 

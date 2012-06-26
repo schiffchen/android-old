@@ -16,7 +16,8 @@ public enum ExtensionElements
 	SHOOT("shoot"),
 	SHIP("ship"),
 	PING("ping"),
-	GAMESTATE("gamestate");
+	GAMESTATE("gamestate"),
+	RESULT("result");
 	
 	/**
 	 * The name of the element as used in xml files

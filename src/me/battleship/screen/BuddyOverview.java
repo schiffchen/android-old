@@ -73,6 +73,8 @@ public class BuddyOverview implements Screen, OnClickListener
 		 * The dialog showing the progress
 		 */
 		Dialog dialog;
+
+		private MatchmakerConnection matchmakerConnection;
 		
 		/**
 		 * Instantiates a new BuddyListAdapter
@@ -146,7 +148,8 @@ public class BuddyOverview implements Screen, OnClickListener
 				builder.setView(root);
 				builder.setCancelable(false);
 				dialog = builder.show();
-				new MatchmakerConnection().queue(this);
+				matchmakerConnection = new MatchmakerConnection();
+				matchmakerConnection.queue(this);
 			}
 			else
 			{
@@ -166,7 +169,8 @@ public class BuddyOverview implements Screen, OnClickListener
 		 */
 		public void startGame(String opponentJID)
 		{
-			Game game = new Game(new OpponentConnection(opponentJID));
+			Game game = new Game(new OpponentConnection(opponentJID, matchmakerConnection));
+			matchmakerConnection = null;
 			dialog.dismiss();
 			dialog = null;
 			ScreenManager.setScreen(game, R.anim.left_out, R.anim.right_in);
