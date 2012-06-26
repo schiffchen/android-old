@@ -12,6 +12,7 @@ import me.battleship.ShipType;
 import me.battleship.communication.messages.BattleshipPacketExtension;
 import me.battleship.communication.messages.DicerollMessage;
 import me.battleship.communication.messages.ExtensionElements;
+import me.battleship.communication.messages.GamestateMessage;
 import me.battleship.communication.messages.MessageUtil;
 import me.battleship.communication.messages.PingMessage;
 
@@ -75,11 +76,17 @@ public class OpponentConnection extends TimerTask implements MessageListener
 	private long lastping;
 
 	/**
+	 * The JID of the opponent
+	 */
+	private final String opponentJID;
+
+	/**
 	 * Establishes a new connection
 	 * @param opponentJID the jabber id of the opponent
 	 */
 	public OpponentConnection(String opponentJID)
 	{
+		this.opponentJID = opponentJID;
 		diceroll = 0;
 		opponentDiceroll = 0;
 		random = new Random();
@@ -201,6 +208,32 @@ public class OpponentConnection extends TimerTask implements MessageListener
 			Log.e(LOG_TAG, "An error occured while sending a shot to the opponent.", e);
 		}
 	}
+	
+	/**
+	 * Sends a message indicating that the game ended
+	 * 
+	 * @param youwon whether you won or not
+	 */
+	public void sendGamestate(boolean youwon)
+	{
+		String looserJID;
+		if (youwon)
+		{
+			looserJID = opponentJID;
+		}
+		else
+		{
+			looserJID = Connection.INSTANCE.jid.getId();
+		}
+		try
+		{
+			chat.sendMessage(new GamestateMessage(looserJID));
+		}
+		catch (XMPPException e)
+		{
+			Log.e(LOG_TAG, "An error occured while sending a gamestat message to the opponent", e);
+		}
+	}
 
 	@Override
 	public void processMessage(@SuppressWarnings("hiding") Chat chat, Message message)
@@ -209,6 +242,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		BattleshipPacketExtension dicerollExtension = extension.getSubElement(ExtensionElements.DICEROLL);
 		BattleshipPacketExtension shoot = extension.getSubElement(ExtensionElements.SHOOT);
 		BattleshipPacketExtension ping = extension.getSubElement(ExtensionElements.PING);
+		BattleshipPacketExtension gamestate = extension.getSubElement(ExtensionElements.GAMESTATE);
 		if (dicerollExtension != null)
 		{
 			Map<String, String> attributes = dicerollExtension.getAttributes();
@@ -255,6 +289,15 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		{
 			Log.i(LOG_TAG, "Received ping from opponent");
 		}
+		else if (gamestate != null)
+		{
+			Map<String, String> attributes = gamestate.getAttributes();
+			String looser = attributes.get("looser");
+			if (looser.equals(opponentJID))
+			{
+				listener.onOpponentLost();
+			}
+		}
 		else
 		{
 			Log.w(LOG_TAG, "Unexpected message:\n" + message.toXML());
@@ -293,6 +336,11 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		 * @param y the y position
 		 */
 		public void onOpponentShot(int x, int y);
+		
+		/**
+		 * This event will be fired when the opponent lost the game
+		 */
+		public void onOpponentLost();
 		
 		/**
 		 * This event will be fired when the opponent disconnected

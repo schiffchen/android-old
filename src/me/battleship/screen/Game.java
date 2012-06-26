@@ -104,6 +104,11 @@ public class Game implements Screen, OpponentConnectionListener
 	 * Indicates whether its your turn or not
 	 */
 	private boolean yourturn;
+	
+	/**
+	 * The ships of the player
+	 */
+	private Set<Ship> ships;
 
 	/**
 	 * Instantiates a new Game
@@ -116,6 +121,7 @@ public class Game implements Screen, OpponentConnectionListener
 		this.connection = connection;
 		connection.setListener(this);
 		gameStarted = false;
+		ships = new HashSet<Ship>();
 		redViews = new HashSet<View>();
 		shipsToPlace = new LinkedList<ShipType>();
 		shipsToPlace.add(ShipType.AIRCRAFT_CARRIER);
@@ -392,6 +398,7 @@ public class Game implements Screen, OpponentConnectionListener
 		refreshPreview();
 		ImageView imageView = new ImageView(activity);
 		Ship ship = new Ship(type, x, y, orientation, imageView);
+		ships.add(ship);
 		imageView.setImageResource(ship.getDrawable());
 		imageView.setLayoutParams(getLayoutParamsForShip(ship));
 		for (int i = 0;i < ship.getSize();i++)
@@ -448,7 +455,7 @@ public class Game implements Screen, OpponentConnectionListener
 	 * @param type the type of the ship
 	 * @return if the position is valid
 	 */
-	public boolean validateShipPos(int x, int y, Orientation orientation, ShipType type)
+	private boolean validateShipPos(int x, int y, Orientation orientation, ShipType type)
 	{
 		if (x < 0)
 			return false;
@@ -498,6 +505,7 @@ public class Game implements Screen, OpponentConnectionListener
 	{
 		markFieldsRed(null);
 		Ship ship = fields[x][y].getShip();
+		ships.remove(ship);
 		x = ship.getX();
 		y = ship.getY();
 		for (int i = 0;i < ship.getSize();i++)
@@ -541,7 +549,6 @@ public class Game implements Screen, OpponentConnectionListener
 		}
 		connection.sendShot(x, y);
 		yourturn = false;
-		// TODO Switch to other view
 	}
 	
 	/**
@@ -662,6 +669,34 @@ public class Game implements Screen, OpponentConnectionListener
 				ship = null;
 			}
 			connection.sendResult(x, y, Result.SHIP, ship);
+			boolean allShipsDestroyed = true;
+			for (Ship tship : ships)
+			{
+				if (!tship.areAllFieldsDestroyed())
+				{
+					allShipsDestroyed = false;
+					break;
+				}
+			}
+			if (allShipsDestroyed)
+			{
+				connection.sendGamestate(false);
+				// TODO Display loosemessage in a more stylish way
+				final Context context = activity;
+				activity.runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						new AlertDialog.Builder(context)
+							// TODO Use i18n string
+							.setTitle("You lost")
+							.setMessage("You're the looser")
+							.setCancelable(true)
+							.show();
+					}
+				});
+			}
 		}
 		activity.runOnUiThread(new Runnable()
 		{
@@ -687,6 +722,27 @@ public class Game implements Screen, OpponentConnectionListener
 				});
 			}
 		}, 1000);
+	}
+	
+	@Override
+	public void onOpponentLost()
+	{
+		connection.sendGamestate(true);
+		// TODO Display winmessage in a more stylish way
+		final Context context = activity;
+		activity.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				new AlertDialog.Builder(context)
+					// TODO Use i18n string
+					.setTitle("You won")
+					.setMessage("You're the winner")
+					.setCancelable(true)
+					.show();
+			}
+		});
 	}
 	
 	@Override

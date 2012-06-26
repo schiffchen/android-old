@@ -15,7 +15,8 @@ public enum ExtensionElements
 	DICEROLL("diceroll"),
 	SHOOT("shoot"),
 	SHIP("ship"),
-	PING("ping");
+	PING("ping"),
+	GAMESTATE("gamestate");
 	
 	/**
 	 * The name of the element as used in xml files
