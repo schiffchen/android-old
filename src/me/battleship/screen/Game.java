@@ -27,6 +27,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -765,6 +766,17 @@ public class Game implements Screen, OpponentConnectionListener
 				builder.show();
 			}
 		});
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		if (keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			new ReallyQuitListener(activity).onCancel(null);
+			return true;
+		}
+		return false;
 	}
 
 	/**

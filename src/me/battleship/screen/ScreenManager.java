@@ -27,6 +27,11 @@ public class ScreenManager
 	final Activity activity;
 	
 	/**
+	 * The current screen
+	 */
+	private Screen currentScreen;
+	
+	/**
 	 * Initializes the ViewManager using startView as initial view
 	 * @param activity the activity in which the view will be displayed
 	 * @param startScreen the screen which will be initially showed
@@ -34,6 +39,7 @@ public class ScreenManager
 	private ScreenManager(Activity activity, Screen startScreen)
 	{
 		this.activity = activity;
+		currentScreen = startScreen;
 		animator = new ViewAnimator(activity);
 		animator.addView(startScreen.getView(activity));
 		animator.setAnimateFirstView(true);
@@ -49,6 +55,7 @@ public class ScreenManager
 	 */
 	private void doSetScreen(final Screen screen, final int outAnimation, final int inAnimation)
 	{
+		currentScreen = screen;
 		activity.runOnUiThread(new Runnable()
 		{
 			@Override
@@ -61,6 +68,15 @@ public class ScreenManager
 				animator.removeViewAt(0);
 			}
 		});
+	}
+	
+	/**
+	 * Returns the current screen
+	 * @return the current screen
+	 */
+	private Screen doGetCurrentScreen()
+	{
+		return currentScreen;
 	}
 	
 	/**
@@ -93,6 +109,15 @@ public class ScreenManager
 	public static void setScreen(Screen screen, int outAnimation, int inAnimation)
 	{
 		getInstance().doSetScreen(screen, outAnimation, inAnimation);
+	}
+	
+	/**
+	 * Returns the current screen
+	 * @return the current screen
+	 */
+	public static Screen getCurrentScreen()
+	{
+		return getInstance().doGetCurrentScreen();
 	}
 	
 	/**

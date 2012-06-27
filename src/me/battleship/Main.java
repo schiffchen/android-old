@@ -6,6 +6,7 @@ import me.battleship.screen.ScreenManager;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 
 /**
  * The main activity
@@ -26,6 +27,16 @@ public class Main extends Activity
 		super.onCreate(savedInstanceState);
 		Log.i(LOG_TAG, "main activity started");
 		ScreenManager.initialize(this, new LoginScreen());
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		if (ScreenManager.getCurrentScreen().onKeyDown(keyCode, event))
+		{
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 	@Override

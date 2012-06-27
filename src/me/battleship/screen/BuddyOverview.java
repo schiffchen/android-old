@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.graphics.Typeface;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -38,6 +39,13 @@ public class BuddyOverview implements Screen, OnClickListener
 		Button logoutButton = (Button) view.findViewById(R.id.logoutButton);
 		logoutButton.setOnClickListener(this);
 		return view;
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		onClick(null);
+		return true;
 	}
 
 	@Override

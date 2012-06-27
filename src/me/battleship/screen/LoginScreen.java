@@ -14,6 +14,7 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -78,6 +79,13 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		Button anonymousLoginButton = (Button) view.findViewById(R.id.buttonAnonymousLogin);
 		anonymousLoginButton.setOnClickListener(this);
 		return view;
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
