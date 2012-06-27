@@ -95,7 +95,7 @@ public class Game implements Screen, OpponentConnectionListener
 	/**
 	 * A dialog displayed while waiting for the enemy
 	 */
-	private AlertDialog waitingDialog;
+	AlertDialog waitingDialog;
 	
 	/**
 	 * Indicates whether the game has already started
@@ -558,7 +558,9 @@ public class Game implements Screen, OpponentConnectionListener
 	void sendDiceroll()
 	{
 		Builder builder = new AlertDialog.Builder(activity);
-		builder.setCancelable(false);
+		builder.setCancelable(true);
+		// TODO
+//		builder.setOnCancelListener(onCancelListener)
 		FrameLayout view = ViewFactory.createView(R.layout.progress_with_text, activity);
 		TextView text = (TextView) view.findViewById(R.id.progessText);
 		text.setText(R.string.waiting_for_opponent);
@@ -761,6 +763,10 @@ public class Game implements Screen, OpponentConnectionListener
 			@Override
 			public void run()
 			{
+				if (waitingDialog != null) {
+					waitingDialog.dismiss();
+					waitingDialog = null;
+				}
 				builder.show();
 			}
 		});
@@ -912,4 +918,25 @@ public class Game implements Screen, OpponentConnectionListener
 			ScreenManager.setScreen(new BuddyOverview(), R.anim.right_out, R.anim.left_in);
 		}
 	}
+	
+//	/**
+//	 * Opens
+//	 * 
+//	 *
+//	 * @author Manuel Vögele
+//	 */
+//	private class CancelWaitingDialogListener implements OnCancelListener
+//	{
+//		public CancelWaitingDialogListener()
+//		{
+//			// Nothing to do
+//		}
+//		
+//		@Override
+//		public void onCancel(DialogInterface dialog)
+//		{
+//			// TODO Auto-generated method stub
+//			
+//		}
+//	}
 }
