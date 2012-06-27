@@ -1,6 +1,15 @@
 package me.battleship.communication;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import me.battleship.util.StringUtils;
+
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -39,6 +48,11 @@ public class Connection
 	JID jid;
 	
 	/**
+	 * The port
+	 */
+	int port;
+	
+	/**
 	 * The password
 	 */
 	String password;
@@ -48,8 +62,7 @@ public class Connection
 	 */
 	public Connection()
 	{
-		// TODO: Implement anonymous login
-		throw new UnsupportedOperationException("Connection() is not implemented yet");
+		// Nothing to do
 	}
 	
 	/**
@@ -63,7 +76,7 @@ public class Connection
 	{
 		fillInstance();
 		this.jid = jid;
-		connection = new XMPPConnection(new ConnectionConfiguration(jid.getDomain(), port));
+		this.port = port;
 		this.password = password;
 	}
 	
@@ -96,6 +109,11 @@ public class Connection
 			@Override
 			protected XMPPException doInBackground(ConnectFinishedListener... params)
 			{
+				if (jid == null)
+				{
+					readAnonymousLoginData();
+				}
+				connection = new XMPPConnection(new ConnectionConfiguration(jid.getDomain(), port));
 				this.listener = params[0];
 				try
 				{
@@ -128,11 +146,40 @@ public class Connection
 	}
 	
 	/**
+	 * Reads the login data for anonymous login
+	 */
+	void readAnonymousLoginData()
+	{
+		try
+		{
+			URL url = new URL("http://battleship.me/anonlogin.json");
+			URLConnection urlConnection = url.openConnection();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+			String line = reader.readLine();
+			reader.close();
+			jid = new JID(StringUtils.readAttributeFromJson(line, "jid") + "/" + StringUtils.readAttributeFromJson(line, "resource"));
+			port = 5222;
+			password = StringUtils.readAttributeFromJson(line, "password");
+		}
+		catch (MalformedURLException e)
+		{
+			Log.e(LOG_TAG, "An error occured while connecting anonymously", e);
+		}
+		catch (IOException e)
+		{
+			Log.e(LOG_TAG, "An error occured while connecting anonymously", e);
+		}
+	}
+	
+	/**
 	 * Disconnects from the server
 	 */
 	public void disconnect()
 	{
-		Log.i(LOG_TAG, "Disconnecting from " + connection.getHost() + ":" + connection.getPort());
-		connection.disconnect();
+		if (connection != null)
+		{
+			Log.i(LOG_TAG, "Disconnecting from " + connection.getHost() + ":" + connection.getPort());
+			connection.disconnect();
+		}
 	}
 }
