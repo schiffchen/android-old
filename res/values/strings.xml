@@ -14,6 +14,8 @@
     <string name="anonymous_login">Anonymous login</string>
     <string name="logout">Logout</string>
     
+    <string name="ok">OK</string>
+    
     <string name="random_opponent">Random opponent</string>
     <string name="searching_for_opponent">Searching for opponent…</string>
     <string name="waiting_for_opponent">Waiting for opponent…</string>
@@ -21,6 +23,12 @@
     <string name="ready">Ready</string> 
     <string name="yourturn">You have the first turn</string>
     <string name="enemysturn">Your opponent has the first turn</string>
+    <string name="youwon_title">You won</string>
+    <string name="youwon_message">You\'re the winner</string>
+	<string name="youlost_title">You lost</string>
+	<string name="youlost_message">You\'re the looser</string>
+	<string name="opponent_quit_title">Opponent quit</string>
+	<string name="opponent_quit_message">The opponent left the game</string>
     
     <string name="aircraft_carrier">Aircraft carrier</string>
     <string name="battleship">Battleship</string>
