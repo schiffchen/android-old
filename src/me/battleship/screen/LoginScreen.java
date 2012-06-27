@@ -13,6 +13,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,7 +28,7 @@ import android.widget.TextView;
  *
  * @author Manuel Vögele
  */
-public class LoginScreen implements Screen, OnClickListener, ConnectFinishedListener
+public class LoginScreen implements Screen, OnClickListener, ConnectFinishedListener, OnCancelListener
 {
 	/**
 	 * The log tag
@@ -84,7 +86,6 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -96,7 +97,8 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		TextView label = (TextView) root.findViewById(R.id.progessText);
 		label.setText(R.string.logging_in);
 		builder.setView(root);
-		builder.setCancelable(false);
+		builder.setCancelable(true);
+		builder.setOnCancelListener(this);
 		dialog = builder.show();
 		Connection connection;
 		if (v.getId() == R.id.buttonLogin)
@@ -136,5 +138,12 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 			textView.setText(errorMessage);
 			return;
 		}
+	}
+	
+	@Override
+	public void onCancel(@SuppressWarnings("hiding") DialogInterface dialog)
+	{
+		Connection.INSTANCE.cleanup();
+		Connection.INSTANCE = null;
 	}
 }

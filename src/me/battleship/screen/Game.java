@@ -91,7 +91,7 @@ public class Game implements Screen, OpponentConnectionListener
 	/**
 	 * The connection to the opponent
 	 */
-	private final OpponentConnection connection;
+	final OpponentConnection connection;
 
 	/**
 	 * A dialog displayed while waiting for the enemy
@@ -926,6 +926,7 @@ public class Game implements Screen, OpponentConnectionListener
 				waitingDialog.dismiss();
 				waitingDialog = null;
 			}
+			connection.cleanup();
 			ScreenManager.setScreen(new BuddyOverview(), R.anim.right_out, R.anim.left_in);
 		}
 	}

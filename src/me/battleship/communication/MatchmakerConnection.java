@@ -170,6 +170,15 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 	}
 	
 	/**
+	 * Closes any background processes. The instance will be unusable after that.
+	 */
+	public void cleanup()
+	{
+		timer.cancel();
+		chat.removeMessageListener(this);
+	}
+	
+	/**
 	 * This will be sent when an opponent was assigned by the matchmaker
 	 *
 	 * @author Manuel Vögele

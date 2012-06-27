@@ -323,6 +323,15 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		}
 		lastping = Calendar.getInstance().getTimeInMillis();
 	}
+	
+	/**
+	 * Closes any background processes. The instance will be unusable after that.
+	 */
+	public void cleanup()
+	{
+		timer.cancel();
+		chat.removeMessageListener(this);
+	}
 
 	/**
 	 * A listener called when both players have placed their ships and the game can start 

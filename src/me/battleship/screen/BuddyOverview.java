@@ -12,6 +12,8 @@ import me.battleship.util.ViewFactory;
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Typeface;
 import android.view.KeyEvent;
 import android.view.View;
@@ -82,7 +84,7 @@ public class BuddyOverview implements Screen, OnClickListener
 		 */
 		Dialog dialog;
 
-		private MatchmakerConnection matchmakerConnection;
+		MatchmakerConnection matchmakerConnection;
 		
 		/**
 		 * Instantiates a new BuddyListAdapter
@@ -154,7 +156,8 @@ public class BuddyOverview implements Screen, OnClickListener
 				TextView label = (TextView) root.findViewById(R.id.progessText);
 				label.setText(R.string.searching_for_opponent);
 				builder.setView(root);
-				builder.setCancelable(false);
+				builder.setCancelable(true);
+				builder.setOnCancelListener(new CancelSearchListener());
 				dialog = builder.show();
 				matchmakerConnection = new MatchmakerConnection();
 				matchmakerConnection.queue(this);
@@ -182,6 +185,29 @@ public class BuddyOverview implements Screen, OnClickListener
 			dialog.dismiss();
 			dialog = null;
 			ScreenManager.setScreen(game, R.anim.left_out, R.anim.right_in);
+		}
+		
+		/**
+		 * Listener for canceling the queueing on the matchmaker
+		 *
+		 * @author Manuel Vögele
+		 */
+		private class CancelSearchListener implements OnCancelListener
+		{
+			/**
+			 * Instantiates a new cancel search listener
+			 */
+			public CancelSearchListener()
+			{
+				// Nothing to do
+			}
+			
+			@Override
+			public void onCancel(@SuppressWarnings("hiding") DialogInterface dialog)
+			{
+				matchmakerConnection.cleanup();
+				matchmakerConnection = null;
+			}
 		}
 	}
 }

@@ -57,6 +57,8 @@ public class Connection
 	 */
 	String password;
 
+	AsyncTask<ConnectFinishedListener, Void, XMPPException> connectTask;
+
 	/**
 	 * Creates a new connection which is set to login anonymously
 	 */
@@ -99,7 +101,7 @@ public class Connection
 	 */
 	public void connect(ConnectFinishedListener connectFinishedListener)
 	{
-		new AsyncTask<ConnectFinishedListener, Void, XMPPException>()
+		connectTask = new AsyncTask<ConnectFinishedListener, Void, XMPPException>()
 		{
 			/**
 			 * The listener that will be used after connecting
@@ -133,6 +135,7 @@ public class Connection
 			@Override
 			protected void onPostExecute(XMPPException result)
 			{
+				connectTask = null;
 				if (listener != null)
 				{
 					listener.onConnectFinished(result);
@@ -142,7 +145,8 @@ public class Connection
 					Log.e(LOG_TAG, "Error while logging in", result);
 				}
 			}
-		}.execute(connectFinishedListener);
+		};
+		connectTask.execute(connectFinishedListener);
 	}
 	
 	/**
@@ -168,6 +172,18 @@ public class Connection
 		catch (IOException e)
 		{
 			Log.e(LOG_TAG, "An error occured while connecting anonymously", e);
+		}
+	}
+	
+	/**
+	 * Closes all background processes. The instance will be unusable after that.
+	 */
+	public void cleanup()
+	{
+		if (connectTask != null)
+		{
+			connectTask.cancel(true);
+			connectTask = null;
 		}
 	}
 	
