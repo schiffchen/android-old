@@ -23,6 +23,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.MotionEvent;
@@ -680,19 +682,19 @@ public class Game implements Screen, OpponentConnectionListener
 			if (allShipsDestroyed)
 			{
 				connection.sendGamestate(false);
-				// TODO Display loosemessage in a more stylish way
-				final Context context = activity;
+				SwitchToMainMenuListener switchToMainMenuListener = new SwitchToMainMenuListener();
+				final Builder builder = new AlertDialog.Builder(activity);
+				builder.setTitle(R.string.youlost_title);
+				builder.setMessage(R.string.youlost_message);
+				builder.setCancelable(true);
+				builder.setOnCancelListener(switchToMainMenuListener);
+				builder.setNeutralButton(R.string.ok, switchToMainMenuListener);
 				activity.runOnUiThread(new Runnable()
 				{
 					@Override
 					public void run()
 					{
-						new AlertDialog.Builder(context)
-							// TODO Use i18n string
-							.setTitle("You lost")
-							.setMessage("You're the looser")
-							.setCancelable(true)
-							.show();
+						builder.show();
 					}
 				});
 			}
@@ -727,19 +729,19 @@ public class Game implements Screen, OpponentConnectionListener
 	public void onOpponentLost()
 	{
 		connection.sendGamestate(true);
-		// TODO Display winmessage in a more stylish way
-		final Context context = activity;
+		SwitchToMainMenuListener switchToMainMenuListener = new SwitchToMainMenuListener();
+		final Builder builder = new AlertDialog.Builder(activity);
+		builder.setTitle(R.string.youwon_title);
+		builder.setMessage(R.string.youwon_message);
+		builder.setCancelable(true);
+		builder.setOnCancelListener(switchToMainMenuListener);
+		builder.setNeutralButton(R.string.ok, switchToMainMenuListener);
 		activity.runOnUiThread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				new AlertDialog.Builder(context)
-					// TODO Use i18n string
-					.setTitle("You won")
-					.setMessage("You're the winner")
-					.setCancelable(true)
-					.show();
+				builder.show();
 			}
 		});
 	}
@@ -747,8 +749,21 @@ public class Game implements Screen, OpponentConnectionListener
 	@Override
 	public void onOpponentDisconnected()
 	{
-		// TODO Auto-generated method stub
-		System.out.println("Opponent disconnected.");
+		SwitchToMainMenuListener switchToMainMenuListener = new SwitchToMainMenuListener();
+		final Builder builder = new AlertDialog.Builder(activity);
+		builder.setTitle(R.string.opponent_quit_title);
+		builder.setMessage(R.string.opponent_quit_message);
+		builder.setCancelable(true);
+		builder.setOnCancelListener(switchToMainMenuListener);
+		builder.setNeutralButton(R.string.ok, switchToMainMenuListener);
+		activity.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				builder.show();
+			}
+		});
 	}
 
 	/**
@@ -859,6 +874,42 @@ public class Game implements Screen, OpponentConnectionListener
 				shipsToPlace.add(next);
 			}
 			refreshPreview();
+		}
+	}
+	
+	/**
+	 * A listener for switching to the main menu
+	 *
+	 * @author Manuel Vögele
+	 */
+	private class SwitchToMainMenuListener implements android.content.DialogInterface.OnClickListener, OnCancelListener
+	{
+		/**
+		 * Initializes a new SwitchToMainMenuListener
+		 */
+		public SwitchToMainMenuListener()
+		{
+			// Nothing to do
+		}
+		
+		@Override
+		public void onClick(DialogInterface dialog, int which)
+		{
+			switchToMainMenu();
+		}
+		
+		@Override
+		public void onCancel(DialogInterface dialog)
+		{
+			switchToMainMenu();
+		}
+		
+		/**
+		 * Switchs to the main menu
+		 */
+		private void switchToMainMenu()
+		{
+			ScreenManager.setScreen(new BuddyOverview(), R.anim.right_out, R.anim.left_in);
 		}
 	}
 }
