@@ -559,8 +559,7 @@ public class Game implements Screen, OpponentConnectionListener
 	{
 		Builder builder = new AlertDialog.Builder(activity);
 		builder.setCancelable(true);
-		// TODO
-//		builder.setOnCancelListener(onCancelListener)
+		builder.setOnCancelListener(new ReallyQuitListener(activity));
 		FrameLayout view = ViewFactory.createView(R.layout.progress_with_text, activity);
 		TextView text = (TextView) view.findViewById(R.id.progessText);
 		text.setText(R.string.waiting_for_opponent);
@@ -763,10 +762,6 @@ public class Game implements Screen, OpponentConnectionListener
 			@Override
 			public void run()
 			{
-				if (waitingDialog != null) {
-					waitingDialog.dismiss();
-					waitingDialog = null;
-				}
 				builder.show();
 			}
 		});
@@ -888,7 +883,7 @@ public class Game implements Screen, OpponentConnectionListener
 	 *
 	 * @author Manuel Vögele
 	 */
-	private class SwitchToMainMenuListener implements android.content.DialogInterface.OnClickListener, OnCancelListener
+	private class SwitchToMainMenuListener implements DialogInterface.OnClickListener, OnCancelListener
 	{
 		/**
 		 * Initializes a new SwitchToMainMenuListener
@@ -915,28 +910,57 @@ public class Game implements Screen, OpponentConnectionListener
 		 */
 		private void switchToMainMenu()
 		{
+			if (waitingDialog != null) {
+				waitingDialog.dismiss();
+				waitingDialog = null;
+			}
 			ScreenManager.setScreen(new BuddyOverview(), R.anim.right_out, R.anim.left_in);
 		}
 	}
 	
-//	/**
-//	 * Opens
-//	 * 
-//	 *
-//	 * @author Manuel Vögele
-//	 */
-//	private class CancelWaitingDialogListener implements OnCancelListener
-//	{
-//		public CancelWaitingDialogListener()
-//		{
-//			// Nothing to do
-//		}
-//		
-//		@Override
-//		public void onCancel(DialogInterface dialog)
-//		{
-//			// TODO Auto-generated method stub
-//			
-//		}
-//	}
+	/**
+	 * Opens a dialog asking whether the opponent really wants to quit the game
+	 * 
+	 *
+	 * @author Manuel Vögele
+	 */
+	private class ReallyQuitListener implements OnCancelListener
+	{
+		/**
+		 * The context
+		 */
+		private final Context context;
+
+		/**
+		 * Initializes a new really quit listener
+		 * @param context the context
+		 */
+		public ReallyQuitListener(Context context)
+		{
+			this.context = context;
+		}
+		
+		@Override
+		public void onCancel(DialogInterface dialog)
+		{
+			Builder builder = new AlertDialog.Builder(context);
+			builder.setTitle(R.string.really_leave_game_title);
+			builder.setMessage(R.string.really_leave_game_message);
+			builder.setCancelable(true);
+			builder.setPositiveButton(R.string.yes, new SwitchToMainMenuListener());
+			builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
+			{
+				
+				@Override
+				public void onClick(@SuppressWarnings("hiding") DialogInterface dialog, int which)
+				{
+					if (waitingDialog != null) 
+					{
+						waitingDialog.show();
+					}
+				}
+			});
+			builder.show();
+		}
+	}
 }

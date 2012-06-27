@@ -15,6 +15,8 @@
     <string name="logout">Logout</string>
     
     <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     
     <string name="random_opponent">Random opponent</string>
     <string name="searching_for_opponent">Searching for opponent…</string>
@@ -29,6 +31,8 @@
 	<string name="youlost_message">You\'re the looser</string>
 	<string name="opponent_quit_title">Opponent quit</string>
 	<string name="opponent_quit_message">The opponent left the game</string>
+	<string name="really_leave_game_title">Really quit?</string>
+	<string name="really_leave_game_message">Do you rally want to leave the game?</string>
     
     <string name="aircraft_carrier">Aircraft carrier</string>
     <string name="battleship">Battleship</string>
