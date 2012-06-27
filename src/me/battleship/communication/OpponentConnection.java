@@ -116,6 +116,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 	@Override
 	public void run()
 	{
+		Log.i(LOG_TAG, "Sending ping to opponent");
 		try
 		{
 			chat.sendMessage(new PingMessage());
@@ -129,6 +130,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		long now = Calendar.getInstance().getTimeInMillis();
 		if (now - lastping > PINGDELAY * 2)
 		{
+			Log.i(LOG_TAG, "The opponent disconnected.");
 			cancel();
 			listener.onOpponentDisconnected();
 		}
@@ -182,6 +184,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 	 */
 	public void sendShot(int x, int y)
 	{
+		Log.i(LOG_TAG, "Sending shot at x:" + x + " y:" + y);
 		try
 		{
 			chat.sendMessage(new ShootMessage(x, y));
@@ -206,6 +209,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 	 */
 	public void sendResult(int x, int y, Result result, Ship ship)
 	{
+		Log.i(LOG_TAG, "Sending shot result x:" + x + " y:" + y + " result:" + result + " ship:" + ship);
 		try
 		{
 			chat.sendMessage(new ShootMessage(x, y, result, ship));
@@ -232,6 +236,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		{
 			looserJID = Connection.INSTANCE.jid.getId();
 		}
+		Log.i(LOG_TAG, "Sending gamestate. Looser: " + looserJID);
 		try
 		{
 			chat.sendMessage(new GamestateMessage(looserJID));
@@ -289,10 +294,12 @@ public class OpponentConnection extends TimerTask implements MessageListener
 					}
 					ship = new Ship(type, sx, sy, orientation, null);
 				}
+				Log.i(LOG_TAG, "Received shot result x:" + x + " y:" + y + " result:" + result + " ship:" + ship);
 				listener.onShotResult(x, y, result, ship);
 			}
 			else
 			{
+				Log.i(LOG_TAG, "Received shot at x:" + x + " y:" + y);
 				listener.onOpponentShot(x, y);
 			}
 		}
@@ -304,6 +311,7 @@ public class OpponentConnection extends TimerTask implements MessageListener
 		{
 			Map<String, String> attributes = gamestate.getAttributes();
 			String looser = attributes.get("looser");
+			Log.i(LOG_TAG, "Received gamestate. Looser:" + looser);
 			if (looser.equals(opponentJID))
 			{
 				listener.onOpponentLost();
