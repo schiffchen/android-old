@@ -7,6 +7,8 @@
     <string name="logging_in">Logging in…</string>
     <string name="login_failed_title">Login failed</string>
     <string name="login_failed_message">Please check your internet connection and your account details.</string>
+    <string name="invalid_jid_title">Invalid jabber id</string>
+    <string name="invalid_jid_message">Please provide a valid jabber id.</string>
     
     <string name="jabberid">Jabber ID</string>
     <string name="password">Password</string>

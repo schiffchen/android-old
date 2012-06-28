@@ -4,6 +4,7 @@ import me.battleship.R;
 import me.battleship.communication.ConnectFinishedListener;
 import me.battleship.communication.Connection;
 import me.battleship.communication.JID;
+import me.battleship.communication.JID.JIDFormatException;
 import me.battleship.util.ViewFactory;
 
 import org.jivesoftware.smack.XMPPException;
@@ -94,10 +95,21 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		builder.setView(root);
 		builder.setCancelable(true);
 		builder.setOnCancelListener(this);
-		dialog = builder.show();
-		Connection connection;
-		connection = new Connection(new JID(jabberid.getText().toString()), Integer.parseInt(port.getText().toString()), password.getText().toString());
-		connection.connect(this);
+		try
+		{
+			Connection connection = new Connection(new JID(jabberid.getText().toString()), Integer.parseInt(port.getText().toString()), password.getText().toString());
+			connection.connect(this);
+			dialog = builder.show();
+		}
+		catch (JIDFormatException e)
+		{
+			builder = new AlertDialog.Builder(activity);
+			builder.setTitle(R.string.invalid_jid_title);
+			builder.setMessage(R.string.invalid_jid_message);
+			builder.setCancelable(true);
+			builder.setNeutralButton(R.string.ok, null);
+			builder.show();
+		}
 	}
 
 	@Override

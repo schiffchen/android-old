@@ -31,15 +31,37 @@ public class JID
 	 * Initializes a jabber id using a full id
 	 * 
 	 * @param id the id
+	 * @throws NullPointerException when the id is null
+	 * @throws JIDFormatException when the format of the jid is invalid
 	 */
-	public JID(String id)
+	public JID(String id) throws NullPointerException, JIDFormatException
 	{
+		if (id == null)
+		{
+			throw new NullPointerException("Id may not be null");
+		}
+		if (!id.contains("@"))
+		{
+			throw new JIDFormatException("Invalid jabber id: " + id);
+		}
 		this.id = id;
 		int atpos = id.indexOf('@');
-		int slashpos = id.indexOf('/');
+		int slashpos;
+		boolean hasResource = id.contains("/");
+		if (hasResource)
+		{
+			slashpos = id.indexOf('/');
+		}
+		else
+		{
+			slashpos = id.length();
+		}
 		node = id.substring(0, atpos);
 		domain = id.substring(atpos + 1, slashpos);
-		resource = id.substring(slashpos + 1, id.length());
+		if (hasResource)
+		{
+			resource = id.substring(slashpos + 1, id.length());
+		}
 	}
 	
 	/**
@@ -82,5 +104,35 @@ public class JID
 	public String toString()
 	{
 		return id;
+	}
+	
+	/**
+	 * Thrown when parsing an invalid jabber id
+	 * 
+	 * @author Manuel Vögele
+	 */
+	public static class JIDFormatException extends Exception
+	{
+		/**
+		 * serialVersionUID
+		 */
+		private static final long serialVersionUID = 154339518072140058L;
+
+		/**
+		 * Instantiates a new JIDFormatException
+		 */
+		public JIDFormatException()
+		{
+			super();
+		}
+
+		/**
+		 * Instantiates a new JIDFormatException
+		 * @param detailMessage the message string
+		 */
+		public JIDFormatException(String detailMessage)
+		{
+			super(detailMessage);
+		}
 	}
 }
