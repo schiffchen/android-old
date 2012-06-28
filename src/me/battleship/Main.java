@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 
 /**
  * The main activity
@@ -26,6 +27,7 @@ public class Main extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		Log.i(LOG_TAG, "main activity started");
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		ScreenManager.initialize(this, new LoginScreen());
 	}
 	
