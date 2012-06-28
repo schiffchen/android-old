@@ -5,13 +5,17 @@ import java.util.List;
 
 import me.battleship.R;
 import me.battleship.communication.Connection;
+import me.battleship.communication.JID;
+import me.battleship.communication.JID.JIDFormatException;
 import me.battleship.communication.MatchmakerConnection;
 import me.battleship.communication.MatchmakerConnection.OpponentAssignedListener;
 import me.battleship.communication.OpponentConnection;
 import me.battleship.util.ViewFactory;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Typeface;
@@ -21,6 +25,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -78,12 +83,20 @@ public class BuddyOverview implements Screen, OnClickListener
 		 * The id of the view containing the selection for 'random opponent'
 		 */
 		int randomOpponentId;
+
+		/**
+		 * The id of the view containing the selection for 'direct connect'
+		 */
+		private int directConnectId;
 		
 		/**
 		 * The dialog showing the progress
 		 */
 		Dialog dialog;
 
+		/**
+		 * The connection to the matchmaker
+		 */
 		MatchmakerConnection matchmakerConnection;
 		
 		/**
@@ -99,7 +112,7 @@ public class BuddyOverview implements Screen, OnClickListener
 		@Override
 		public int getCount()
 		{
-			return buddys.size() + 1;
+			return buddys.size() + 2;
 		}
 
 		@Override
@@ -109,7 +122,7 @@ public class BuddyOverview implements Screen, OnClickListener
 			{
 				return null;
 			}
-			return buddys.get(position + 1);
+			return buddys.get(position + 2);
 		}
 
 		@Override
@@ -134,12 +147,20 @@ public class BuddyOverview implements Screen, OnClickListener
 			{
 				text.setTypeface(Typeface.DEFAULT_BOLD);
 				text.setText(R.string.random_opponent);
-				randomOpponentId = text.getId();
+				randomOpponentId = 0;
+				text.setId(randomOpponentId);
+			}
+			else if (position == 1)
+			{
+				text.setTypeface(Typeface.DEFAULT_BOLD);
+				text.setText(R.string.direct_connect);
+				directConnectId = 1;
+				text.setId(directConnectId);
 			}
 			else
 			{
 				text.setTypeface(Typeface.DEFAULT);
-				text.setText(buddys.get(position + 1));
+				text.setText(buddys.get(position + 2));
 			}
 			text.setPadding(0, 15, 0, 15);
 			text.setOnClickListener(this);
@@ -161,6 +182,59 @@ public class BuddyOverview implements Screen, OnClickListener
 				dialog = builder.show();
 				matchmakerConnection = new MatchmakerConnection();
 				matchmakerConnection.queue(this);
+			}
+			else if (v.getId() == directConnectId)
+			{
+				final Context context = activity;
+				final EditText editText = new EditText(activity);
+				editText.setHint(R.string.jabberid);
+				editText.requestFocus();
+				Builder builder = new Builder(activity);
+				builder.setTitle(R.string.direct_connect);
+				builder.setView(editText);
+				builder.setCancelable(true);
+				builder.setNegativeButton(R.string.cancel, null);
+				builder.setPositiveButton(R.string.connect, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialogInterface, int which)
+					{
+						String jidstring = editText.getText().toString();
+						try
+						{
+							JID opponentJID = new JID(jidstring);
+							startGame(opponentJID.getId());
+						}
+						catch (JIDFormatException e)
+						{
+							@SuppressWarnings("hiding")
+							Builder builder = new AlertDialog.Builder(context);
+							builder.setTitle(R.string.invalid_jid_title);
+							builder.setMessage(R.string.invalid_jid_message);
+							builder.setCancelable(true);
+							builder.setOnCancelListener(new OnCancelListener()
+							{
+								@Override
+								@SuppressWarnings("hiding")
+								public void onCancel(DialogInterface dialogInterface)
+								{
+									dialog.show();
+								}
+							});
+							builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener()
+							{
+								@Override
+								@SuppressWarnings("hiding")
+								public void onClick(DialogInterface dialogInterface, int which)
+								{
+									dialog.show();
+								}
+							});
+							builder.show();
+						}
+					}
+				});
+				dialog = builder.show();
 			}
 			else
 			{

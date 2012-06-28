@@ -18,9 +18,12 @@
     <string name="logout">Logout</string>
     
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     
+    <string name="connect">Connect</string>
+    <string name="direct_connect">Direct connect</string>
     <string name="random_opponent">Random opponent</string>
     <string name="searching_for_opponent">Searching for opponent…</string>
     <string name="waiting_for_opponent">Waiting for opponent…</string>
