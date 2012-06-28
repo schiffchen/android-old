@@ -1,7 +1,6 @@
 package me.battleship.screen;
 
 import android.app.Activity;
-import android.util.Log;
 import android.widget.ViewAnimator;
 
 /**
@@ -19,27 +18,30 @@ public class ScreenManager
 	/**
 	 * The animator for making the transitions
 	 */
-	ViewAnimator animator;
+	static ViewAnimator animator;
 
 	/**
 	 * The activity for which the screens are handled
 	 */
-	final Activity activity;
+	static Activity activity;
 	
 	/**
 	 * The current screen
 	 */
-	private Screen currentScreen;
+	private static Screen currentScreen;
 	
 	/**
-	 * Initializes the ViewManager using startView as initial view
-	 * @param activity the activity in which the view will be displayed
-	 * @param startScreen the screen which will be initially showed
+	 * Initializes the ViewManager
+	 * 
+	 * @param activity the activity for which the view should be managed
+	 * @param startScreen the screen which is initially displayed
 	 */
-	private ScreenManager(Activity activity, Screen startScreen)
+	public static void initialize(@SuppressWarnings("hiding") Activity activity, Screen startScreen)
 	{
-		this.activity = activity;
-		currentScreen = startScreen;
+		if (activity == null) {
+			throw new IllegalStateException("The ScreenManager has already been initialized");
+		}
+		ScreenManager.activity = activity;
 		animator = new ViewAnimator(activity);
 		animator.addView(startScreen.getView(activity));
 		animator.setAnimateFirstView(true);
@@ -53,8 +55,9 @@ public class ScreenManager
 	 * @param outAnimation the animation to animate the current view out
 	 * @param inAnimation the animation to animate the new view in
 	 */
-	private void doSetScreen(final Screen screen, final int outAnimation, final int inAnimation)
+	public static void setScreen(final Screen screen, final int outAnimation, final int inAnimation)
 	{
+		checkInit();
 		currentScreen = screen;
 		activity.runOnUiThread(new Runnable()
 		{
@@ -72,64 +75,21 @@ public class ScreenManager
 	
 	/**
 	 * Returns the current screen
-	 * @return the current screen
+	 * @return the current screen - <code>null</code> if the screen manager is not initialized
 	 */
-	private Screen doGetCurrentScreen()
+	public static Screen getCurrentScreen()
 	{
 		return currentScreen;
 	}
 	
 	/**
-	 * The only one instance of the ViewManager
+	 * Checks whether the screen manager is initialized. Throws an exception if not
+	 * @throws IllegalStateException if the screen manager is not initialized
 	 */
-	private static ScreenManager instance;
-	
-	/**
-	 * Initializes the ViewManager
-	 * 
-	 * @param activity the activity for which the view should be managed
-	 * @param startScreen the screen which is initially displayed
-	 */
-	public static void initialize(Activity activity, Screen startScreen)
+	public static void checkInit() throws IllegalStateException
 	{
-		if (instance != null)
-		{
-			Log.w(LOG_TAG, new IllegalStateException("ViewManager has already been initialized"));
+		if (activity == null) {
+			throw new IllegalStateException("The screen manager is not initialized");
 		}
-		instance = new ScreenManager(activity, startScreen);
-	}
-	
-	/**
-	 * Changes the view to the passed view
-	 * 
-	 * @param screen the new screen
-	 * @param outAnimation the animation to animate the current view out
-	 * @param inAnimation the animation to animate the new view in
-	 */
-	public static void setScreen(Screen screen, int outAnimation, int inAnimation)
-	{
-		getInstance().doSetScreen(screen, outAnimation, inAnimation);
-	}
-	
-	/**
-	 * Returns the current screen
-	 * @return the current screen
-	 */
-	public static Screen getCurrentScreen()
-	{
-		return getInstance().doGetCurrentScreen();
-	}
-	
-	/**
-	 * Returns the only instance of ViewManager
-	 * @return the only instance of ViewManager
-	 */
-	private static ScreenManager getInstance()
-	{
-		if (instance == null)
-		{
-			throw new IllegalStateException("ViewManager has not been initialized,");
-		}
-		return instance;
 	}
 }
