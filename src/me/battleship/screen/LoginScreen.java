@@ -1,6 +1,5 @@
 package me.battleship.screen;
 
-import me.battleship.LoginCredentials;
 import me.battleship.R;
 import me.battleship.communication.ConnectFinishedListener;
 import me.battleship.communication.Connection;
@@ -71,11 +70,9 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		this.activity = activity;
 		view = ViewFactory.createView(R.layout.login, activity);
 		jabberid = (EditText) view.findViewById(R.id.editJabberId);
-		jabberid.setText(LoginCredentials.USERNAME);
 		password = (EditText) view.findViewById(R.id.editPassword);
-		password.setText(LoginCredentials.PASSWORD);
 		port = (EditText) view.findViewById(R.id.editPort);
-		port.setText("80");
+		port.setText("6667");
 		Button loginButton = (Button) view.findViewById(R.id.buttonLogin);
 		loginButton.setOnClickListener(this);
 		Button anonymousLoginButton = (Button) view.findViewById(R.id.buttonAnonymousLogin);
