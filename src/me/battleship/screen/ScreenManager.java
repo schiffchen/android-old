@@ -42,6 +42,7 @@ public class ScreenManager
 			throw new IllegalStateException("The ScreenManager has already been initialized");
 		}
 		ScreenManager.activity = activity;
+		currentScreen = startScreen;
 		animator = new ViewAnimator(activity);
 		animator.addView(startScreen.getView(activity));
 		animator.setAnimateFirstView(true);

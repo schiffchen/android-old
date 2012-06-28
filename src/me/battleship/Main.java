@@ -43,6 +43,8 @@ public class Main extends Activity
 	protected void onDestroy()
 	{
 		super.onDestroy();
-		Connection.INSTANCE.disconnect();
+		if (Connection.INSTANCE != null) {
+			Connection.INSTANCE.disconnect();
+		}
 	}
 }
