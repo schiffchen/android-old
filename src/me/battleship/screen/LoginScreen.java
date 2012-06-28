@@ -75,8 +75,6 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		port.setText("6667");
 		Button loginButton = (Button) view.findViewById(R.id.buttonLogin);
 		loginButton.setOnClickListener(this);
-		Button anonymousLoginButton = (Button) view.findViewById(R.id.buttonAnonymousLogin);
-		anonymousLoginButton.setOnClickListener(this);
 		return view;
 	}
 
@@ -98,14 +96,7 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		builder.setOnCancelListener(this);
 		dialog = builder.show();
 		Connection connection;
-		if (v.getId() == R.id.buttonLogin)
-		{
-			connection = new Connection(new JID(jabberid.getText().toString()), Integer.parseInt(port.getText().toString()), password.getText().toString());
-		}
-		else
-		{
-			connection = new Connection();
-		}
+		connection = new Connection(new JID(jabberid.getText().toString()), Integer.parseInt(port.getText().toString()), password.getText().toString());
 		connection.connect(this);
 	}
 

@@ -58,14 +58,6 @@ public class Connection
 	String password;
 
 	AsyncTask<ConnectFinishedListener, Void, XMPPException> connectTask;
-
-	/**
-	 * Creates a new connection which is set to login anonymously
-	 */
-	public Connection()
-	{
-		// Nothing to do
-	}
 	
 	/**
 	 * Creates a new connection using the specified login credentials
@@ -111,10 +103,6 @@ public class Connection
 			@Override
 			protected XMPPException doInBackground(ConnectFinishedListener... params)
 			{
-				if (jid == null)
-				{
-					readAnonymousLoginData();
-				}
 				connection = new XMPPConnection(new ConnectionConfiguration(jid.getDomain(), port));
 				this.listener = params[0];
 				try
