@@ -113,17 +113,12 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		{
 			Log.e(LOG_TAG, "Error while logging in", e);
 			Connection.INSTANCE.disconnect();
-			String errorMessage;
-			if (e.getMessage().contains("authentication failed"))
-			{
-				errorMessage = activity.getString(R.string.authentication_failed);
-			}
-			else
-			{
-				errorMessage = e.getWrappedThrowable().getMessage();
-			}
-			TextView textView = (TextView) view.findViewById(R.id.errorMessage);
-			textView.setText(errorMessage);
+			Builder builder = new AlertDialog.Builder(activity);
+			builder.setTitle(R.string.login_failed_title);
+			builder.setMessage(R.string.login_failed_message);
+			builder.setCancelable(true);
+			builder.setNeutralButton(R.string.ok, null);
+			builder.show();
 			return;
 		}
 	}
