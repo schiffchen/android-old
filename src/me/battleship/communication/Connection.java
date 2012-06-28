@@ -1,15 +1,6 @@
 package me.battleship.communication;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-
-import me.battleship.util.StringUtils;
-
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -135,32 +126,6 @@ public class Connection
 			}
 		};
 		connectTask.execute(connectFinishedListener);
-	}
-	
-	/**
-	 * Reads the login data for anonymous login
-	 */
-	void readAnonymousLoginData()
-	{
-		try
-		{
-			URL url = new URL("http://battleship.me/anonlogin.json");
-			URLConnection urlConnection = url.openConnection();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-			String line = reader.readLine();
-			reader.close();
-			jid = new JID(StringUtils.readAttributeFromJson(line, "jid") + "/" + StringUtils.readAttributeFromJson(line, "resource"));
-			port = 5222;
-			password = StringUtils.readAttributeFromJson(line, "password");
-		}
-		catch (MalformedURLException e)
-		{
-			Log.e(LOG_TAG, "An error occured while connecting anonymously", e);
-		}
-		catch (IOException e)
-		{
-			Log.e(LOG_TAG, "An error occured while connecting anonymously", e);
-		}
 	}
 	
 	/**
