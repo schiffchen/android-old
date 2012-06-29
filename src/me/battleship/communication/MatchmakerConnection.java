@@ -135,6 +135,7 @@ public class MatchmakerConnection extends TimerTask implements MessageListener
 		{
 			timer.cancel();
 			String opponentJID = attributes.get("jid");
+			@SuppressWarnings("hiding")
 			String matchId = attributes.get("mid");
 			Log.i(LOG_TAG, "Assigned to: " + opponentJID + " mid: " + matchId);
 			try

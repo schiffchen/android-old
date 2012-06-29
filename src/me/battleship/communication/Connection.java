@@ -48,6 +48,9 @@ public class Connection
 	 */
 	String password;
 
+	/**
+	 * The task used for connecting
+	 */
 	AsyncTask<ConnectFinishedListener, Void, XMPPException> connectTask;
 	
 	/**
