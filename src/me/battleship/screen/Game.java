@@ -443,6 +443,7 @@ public class Game implements Screen, OpponentConnectionListener
 			if (allShipsDestroyed)
 			{
 				connection.sendGamestate(false);
+				connection.cleanup();
 				SwitchToMainMenuListener switchToMainMenuListener = new SwitchToMainMenuListener();
 				final Builder builder = new AlertDialog.Builder(activity);
 				builder.setTitle(R.string.youlost_title);
@@ -490,6 +491,7 @@ public class Game implements Screen, OpponentConnectionListener
 	public void onOpponentLost()
 	{
 		connection.sendGamestate(true);
+		connection.cleanup();
 		SwitchToMainMenuListener switchToMainMenuListener = new SwitchToMainMenuListener();
 		final Builder builder = new AlertDialog.Builder(activity);
 		builder.setTitle(R.string.youwon_title);
