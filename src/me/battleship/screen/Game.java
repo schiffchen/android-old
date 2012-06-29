@@ -125,6 +125,7 @@ public class Game implements Screen, OpponentConnectionListener
 		shipsToPlace.add(ShipType.AIRCRAFT_CARRIER);
 		shipsToPlace.add(ShipType.BATTLESHIP);
 		shipsToPlace.add(ShipType.SUBMARINE);
+		shipsToPlace.add(ShipType.SUBMARINE);
 		shipsToPlace.add(ShipType.DESTROYER);
 		playerPlayground = new Playground();
 		opponentPlayground = new Playground();
