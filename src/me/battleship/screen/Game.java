@@ -28,6 +28,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -107,6 +109,21 @@ public class Game implements Screen, OpponentConnectionListener
 	 * The ships of the player
 	 */
 	private Set<Ship> ships;
+	
+	/**
+	 * The sound pool
+	 */
+	private SoundPool soundPool;
+
+	/**
+	 * The id of the splash sound
+	 */
+	private int splashSound;
+
+	/**
+	 * The id of the explosion sound
+	 */
+	private int explosionSound;
 
 	/**
 	 * Instantiates a new Game
@@ -135,6 +152,9 @@ public class Game implements Screen, OpponentConnectionListener
 	public View getView(@SuppressWarnings("hiding") Activity activity)
 	{
 		this.activity = activity;
+		soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+		splashSound = soundPool.load(activity, R.raw.splash, 1);
+		explosionSound = soundPool.load(activity, R.raw.explosion, 1);
 		root = ViewFactory.createView(R.layout.game, activity);
 		playgroundView = (RelativeLayout) root.findViewById(R.id.playgroundGrid);
 		playerPlayground.drawView(playgroundView, new FieldTouchListener());
@@ -365,7 +385,16 @@ public class Game implements Screen, OpponentConnectionListener
 	{
 		PlaygroundField field = opponentPlayground.getField(x, y);
 		field.setHit(true);
-		field.setIsShip(result == Result.SHIP);
+		boolean isShip = (result == Result.SHIP);
+		field.setIsShip(isShip);
+		if (isShip)
+		{
+			soundPool.play(explosionSound, 1, 1, 0, 0, 1);
+		}
+		else
+		{
+			soundPool.play(splashSound, 1, 1, 0, 0, 1);
+		}
 		if (ship != null)
 		{
 			ImageView imageView = new ImageView(activity);
@@ -422,10 +451,12 @@ public class Game implements Screen, OpponentConnectionListener
 		Ship ship = field.getShip();
 		if (ship == null)
 		{
+			soundPool.play(splashSound, 1, 1, 0, 0, 1);
 			connection.sendResult(x, y, Result.WATER, null);
 		}
 		else
 		{
+			soundPool.play(explosionSound, 1, 1, 0, 0, 1);
 			ship.destroyField(x, y);
 			if (!ship.areAllFieldsDestroyed())
 			{
