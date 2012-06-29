@@ -2,6 +2,9 @@ package me.battleship;
 
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 
 /**
  * A ship
@@ -301,5 +304,37 @@ public class Ship
 	public void setView(View view)
 	{
 		this.view = view;
+	}
+	
+	/**
+	 * Returns the LayoutParams for the specified ship
+	 * 
+	 * @param ship
+	 *           the ship
+	 * @return the layout params for the ship
+	 */
+	public static RelativeLayout.LayoutParams getLayoutParamsForShip(Ship ship)
+	{
+		LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		int startX = ship.getX();
+		int startY = ship.getY();
+		int endX;
+		int endY;
+		int size = ship.getSize() - 1;
+		if (ship.getOrientation() == Orientation.HORIZONTAL)
+		{
+			endX = startX + size;
+			endY = startY;
+		}
+		else
+		{
+			endX = startX;
+			endY = startY + size;
+		}
+		layoutParams.addRule(RelativeLayout.ALIGN_LEFT, Playground.getViewId(startX, startY));
+		layoutParams.addRule(RelativeLayout.ALIGN_TOP, Playground.getViewId(startX, startY));
+		layoutParams.addRule(RelativeLayout.ALIGN_RIGHT, Playground.getViewId(endX, endY));
+		layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, Playground.getViewId(endX, endY));
+		return layoutParams;
 	}
 }

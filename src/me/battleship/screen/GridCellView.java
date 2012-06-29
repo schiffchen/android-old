@@ -1,5 +1,6 @@
 package me.battleship.screen;
 
+import me.battleship.Playground;
 import android.content.Context;
 import android.widget.FrameLayout;
 
@@ -28,7 +29,7 @@ public class GridCellView extends FrameLayout
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 	{
 		int w = MeasureSpec.getSize(widthMeasureSpec);
-		height = (height < w / Game.SIZE ? w / Game.SIZE : height);
+		height = (height < w / Playground.SIZE ? w / Playground.SIZE : height);
 		super.onMeasure(MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(widthMeasureSpec)), MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(widthMeasureSpec)));
 	}
 }
