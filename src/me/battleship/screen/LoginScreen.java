@@ -31,6 +31,11 @@ import android.widget.TextView;
 public class LoginScreen implements Screen, OnClickListener, ConnectFinishedListener, OnCancelListener
 {
 	/**
+	 * The default port
+	 */
+	private static final int DEFAULT_PORT = 5222;
+
+	/**
 	 * The log tag
 	 */
 	public static final String LOG_TAG = "LoginScreen";
@@ -53,27 +58,27 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 	/**
 	 * The text field for the jabber id
 	 */
-	private EditText jabberid;
+	private EditText jabberidInput;
 	
 	/**
 	 * The text field for the password
 	 */
-	private EditText password;
+	private EditText passwordInput;
 	
 	/**
 	 * The text field for the port
 	 */
-	private EditText port;
+	private EditText portInput;
 	
 	@Override
 	public View getView(@SuppressWarnings("hiding") Activity activity)
 	{
 		this.activity = activity;
 		view = ViewFactory.createView(R.layout.login, activity);
-		jabberid = (EditText) view.findViewById(R.id.editJabberId);
-		password = (EditText) view.findViewById(R.id.editPassword);
-		port = (EditText) view.findViewById(R.id.editPort);
-		port.setText("6667");
+		jabberidInput = (EditText) view.findViewById(R.id.editJabberId);
+		passwordInput = (EditText) view.findViewById(R.id.editPassword);
+		portInput = (EditText) view.findViewById(R.id.editPort);
+		portInput.setText(String.valueOf(DEFAULT_PORT));
 		Button loginButton = (Button) view.findViewById(R.id.buttonLogin);
 		loginButton.setOnClickListener(this);
 		return view;
@@ -97,7 +102,9 @@ public class LoginScreen implements Screen, OnClickListener, ConnectFinishedList
 		builder.setOnCancelListener(this);
 		try
 		{
-			Connection connection = new Connection(new JID(jabberid.getText().toString()), Integer.parseInt(port.getText().toString()), password.getText().toString());
+			String portstr = portInput.getText().toString();
+			int port = (portstr.equals("") ? DEFAULT_PORT : Integer.parseInt(portstr));
+			Connection connection = new Connection(new JID(jabberidInput.getText().toString()), port, passwordInput.getText().toString());
 			connection.connect(this);
 			dialog = builder.show();
 		}
